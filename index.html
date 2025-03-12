@@ -1,111 +1,312 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="Charlie Brunold's Personal Portfolio showcasing his technical projects and personal experience">
-        <title>Charlie Brunold | Home</title>
-        <!-- Link to normalize CSS to reset browser defaults -->
-         <link rel="stylesheet" href="css/normalize.css">
-        <!-- Link to main CSS file -->
-        <link rel="stylesheet" href="css/styles.css">
-        <!-- Link to responsive styles -->
-         <link rel="stylesheet" hred="css/responsive.css">
-        <!-- Favicon can be added here later?? -->
-    </head>
-    <body>
-        <!-- header section containing logo and navigation -->
-         <header>
-            <div class="container">
-                <div class="logo">
-                    <h1>Charlie Brunold</h1>
-                </div>
-                <nav>
-                    <ul>
-                        <li><a href="index.html" class="active">Home</a></li>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="projects.html">Projects</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </nav>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal portfolio website showcasing data science skills and projects">
+    <title>Your Name | Data Scientist & Web Developer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Link to normalize CSS to reset browser defaults -->
+    <link rel="stylesheet" href="css/normalize.css">
+    <!-- Link to main stylesheet -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Link to responsive styles -->
+    <link rel="stylesheet" href="css/responsive.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+</head>
+<body>
+    <!-- Header section containing logo and navigation -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Your Name</h1>
             </div>
-         </header>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="projects.html">Projects</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-         <!-- Main content area -->
-          <main>
-            <!-- Hero section - Introduction -->
-             <section class="hero">
-                <div class="container">
-                    <h2>Charlie Brunold's Portfolio</h2>
-                    <p>Data Scientist | Engineer | Problem Solver</p>
+    <!-- Main content area -->
+    <main>
+        <!-- Hero section - Introduction -->
+        <section class="hero">
+            <div class="container">
+                <h2>Data Scientist & Web Developer</h2>
+                <p>Turning complex data into meaningful insights and creating user-friendly web experiences</p>
+                <div class="hero-buttons">
                     <a href="projects.html" class="btn">View My Work</a>
+                    <a href="contact.html" class="btn btn-secondary">Get In Touch</a>
                 </div>
-             </section>
-
-             <!-- Featured projects section -->
-              <section class="featured-projects">
-                <div class="container">
-                    <h2>Featured Projects</h2>
-                    <div class="projects-grid">
-                        <!-- Project 1, Placeholder for the time being -->
-                        <div class="project-card">
-                            <h3>Placeholder Project 1</h3>
-                            <p>A brief description of the project will go here.</p>
-                            <a href="projects.html" class="btn-small">Learn More</a>
-                        </div>
-
-                        <!-- Project 2, Placeholder for the time being -->
-                        <div class="project-card">
-                            <h3>Placeholder Project 2</h3>
-                            <p>A brief description of the project will go here.</p>
-                            <a href="projects.html" class="btn-small">Learn More</a>
-                        </div>
-
-                        <!-- Note that we can add as many more projects as we need here, just repeat the code from above -->
-                    </div>
-                </div>
-              </section>
-
-              <!-- Skills section -->
-               <section class="skills">
-                <div class="container">
-                    <h2>Skills</h2>
-                    <div class="skills-container">
-                        <!-- Skill categories, placeholders for now but update later. -->
-                         <div class="skill-category">
-                            <h3>Placeholder Skill Category</h3>
-                            <ul>
-                                <li>Placeholder Skill 1</li>
-                                <li>Placeholder Skill 2</li>
-                                <li>Placeholder Skill 3</li>
-                            </ul>
-                         </div>
-
-                         <div class="skill-category">
-                            <h3>Placeholder Skill Category</h3>
-                            <ul>
-                                <li>Placeholder Skill 1</li>
-                                <li>Placeholder Skill 2</li>
-                                <li>Placeholder Skill 3</li>
-                            </ul>
-                         </div>
-                    </div>
-                </div>
-               </section>
-          </main>
-
-          <!-- Footer Section -->
-           <footer>
-            <div class="container">
-                <p>&copy; 2025 Charlie Brunold. All rights reserved.</p>
-                <!-- Add social media links -->
-                 <div class="social-links">
-                    <a href="https://www.linkedin.com/in/charliebrunold" target="_blank">LinkedIn</a>
-                 </div>
             </div>
-           </footer>
+        </section>
 
-           <!-- Link to JavaScript file -->
-            <script src="js/main.js"></script>
-    </body>
+        <!-- Featured projects section -->
+        <section class="featured-projects reveal">
+            <div class="container">
+                <h2 class="text-center">Featured Projects</h2>
+                <div class="projects-grid">
+                    <!-- Project 1 - Replace with your actual project -->
+                    <div class="project-card" data-category="data-science">
+                        <div class="project-image">
+                            <div class="project-image-placeholder">
+                                <p>Project Image</p>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3>Data Visualization Dashboard</h3>
+                            <p>An interactive dashboard visualizing insights from complex datasets using D3.js and modern web technologies.</p>
+                            <div class="project-tags">
+                                <span class="tag">Python</span>
+                                <span class="tag">D3.js</span>
+                                <span class="tag">Data Analysis</span>
+                            </div>
+                            <div class="project-links">
+                                <a href="projects.html" class="btn-small">View Details</a>
+                                <a href="#" class="btn-small btn-secondary"><i class="fab fa-github"></i> GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 2 - Replace with your actual project -->
+                    <div class="project-card" data-category="machine-learning">
+                        <div class="project-image">
+                            <div class="project-image-placeholder">
+                                <p>Project Image</p>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3>Predictive Analytics Model</h3>
+                            <p>A machine learning model that predicts customer behavior using advanced algorithms and statistical techniques.</p>
+                            <div class="project-tags">
+                                <span class="tag">Python</span>
+                                <span class="tag">Scikit-learn</span>
+                                <span class="tag">Machine Learning</span>
+                            </div>
+                            <div class="project-links">
+                                <a href="projects.html" class="btn-small">View Details</a>
+                                <a href="#" class="btn-small btn-secondary"><i class="fab fa-github"></i> GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 3 - Replace with your actual project -->
+                    <div class="project-card" data-category="web-dev">
+                        <div class="project-image">
+                            <div class="project-image-placeholder">
+                                <p>Project Image</p>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3>Responsive Web Application</h3>
+                            <p>A fully responsive web application built with modern JavaScript frameworks and best practices in web development.</p>
+                            <div class="project-tags">
+                                <span class="tag">HTML/CSS</span>
+                                <span class="tag">JavaScript</span>
+                                <span class="tag">Responsive Design</span>
+                            </div>
+                            <div class="project-links">
+                                <a href="projects.html" class="btn-small">View Details</a>
+                                <a href="#" class="btn-small btn-secondary"><i class="fab fa-github"></i> GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="projects.html" class="btn">View All Projects</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills section -->
+        <section class="skills section-alt reveal">
+            <div class="container">
+                <h2 class="text-center">Skills & Expertise</h2>
+                <div class="skills-container">
+                    <!-- Data Science Skills -->
+                    <div class="skill-category">
+                        <h3><i class="fas fa-chart-line"></i> Data Science</h3>
+                        <div class="skill-bar">
+                            <div class="skill-bar-name">
+                                <span>Python</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-name">
+                                <span>Data Analysis</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-name">
+                                <span>Machine Learning</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-name">
+                                <span>Data Visualization</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 90%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Web Development Skills -->
+                    <div class="skill-category">
+                        <h3><i class="fas fa-code"></i> Web Development</h3>
+                        <div class="skill-bar">
+                            <div class="skill-bar-name">
+                                <span>HTML & CSS</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-name">
+                                <span>JavaScript</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-name">
+                                <span>Responsive Design</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-name">
+                                <span>UI/UX Principles</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tools & Technologies -->
+                    <div class="skill-category">
+                        <h3><i class="fas fa-tools"></i> Tools & Technologies</h3>
+                        <div class="skill-bar">
+                            <div class="skill-bar-name">
+                                <span>Git & Version Control</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-name">
+                                <span>SQL & Databases</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-name">
+                                <span>Tableau</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-name">
+                                <span>Cloud Services</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Brief About Section -->
+        <section class="brief-about reveal">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about-image">
+                        <div class="profile-image-placeholder">
+                            <p>Profile Image</p>
+                        </div>
+                    </div>
+                    <div class="about-text">
+                        <h2>About Me</h2>
+                        <p>Hi there! I'm a passionate data scientist and web developer with a strong background in creating data-driven applications and meaningful visualizations. I combine analytical skills with creative problem-solving to tackle challenging technical problems.</p>
+                        <p>My journey in technology began with a curiosity about how data can tell compelling stories and drive decision-making. Since then, I've worked on projects ranging from complex machine learning models to user-friendly web applications.</p>
+                        <div class="mt-3">
+                            <a href="about.html" class="btn">Learn More About Me</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="cta section-alt reveal">
+            <div class="container text-center">
+                <h2>Let's Work Together</h2>
+                <p>Interested in collaborating or have a project in mind? I'm always open to discussing new opportunities.</p>
+                <div class="mt-3">
+                    <a href="contact.html" class="btn">Get In Touch</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer section -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Charlie Brunold. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="#" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" target="_blank" aria-label="Medium"><i class="fab fa-medium-m"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Link to JavaScript file -->
+    <script src="js/main.js"></script>
+</body>
 </html>
