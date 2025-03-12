@@ -1,0 +1,202 @@
+/* 
+ * responsive.css - Responsive design rules for portfolio website
+ * This file contains media queries and responsive adjustments for different screen sizes.
+ */
+
+/* 
+ * Media Queries
+ * Mobile-first approach: styles arranged from small screens to large
+ */
+
+/* Base styles are for mobile (up to 576px) */
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {
+    /* Small adjustments for slightly larger screens */
+    .container {
+        padding: 0 1.5rem;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    /* Typography scaling */
+    h1 {
+        font-size: 3rem;
+    }
+    
+    h2 {
+        font-size: 2.25rem;
+    }
+    
+    h3 {
+        font-size: 1.75rem;
+    }
+    
+    /* Layout adjustments */
+    .container {
+        padding: 0 2rem;
+    }
+    
+    /* Projects grid - 2 columns for tablets */
+    .projects-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    /* Projects grid - 3 columns for desktops */
+    .projects-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    /* Timeline adjustments */
+    .timeline {
+        margin-left: 100px;
+    }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    /* Container max width matches our variables */
+    .container {
+        max-width: var(--container-width);
+    }
+}
+
+/* 
+ * Responsive adjustments for specific elements
+ */
+
+/* Mobile navigation (For screens smaller than 768px) */
+@media (max-width: 767px) {
+    /* Header adjustments */
+    header .container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .logo {
+        margin-bottom: 1rem;
+    }
+    
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    nav ul li {
+        margin: 0 0.5rem 0.5rem;
+    }
+    
+    /* Contact page layout */
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Timeline adjustments */
+    .timeline::after {
+        left: 31px;
+    }
+    
+    .timeline-item {
+        padding-left: 70px;
+    }
+    
+    /* About page layout */
+    .about-content {
+        flex-direction: column;
+    }
+    
+    .about-image {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    /* Skills section layout */
+    .skills-container {
+        flex-direction: column;
+    }
+    
+    .skill-category {
+        margin-bottom: var(--spacing-md);
+    }
+}
+
+/* 
+ * Print styles
+ * Optimize the page for printing (for résumé sections)
+ */
+@media print {
+    /* Hide navigation, footer, and interactive elements */
+    header,
+    footer,
+    .contact-form,
+    .btn,
+    .btn-small {
+        display: none;
+    }
+    
+    /* Adjust colors for better print quality */
+    body {
+        color: black;
+        background-color: white;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        color: black;
+    }
+    
+    /* Remove shadows and effects that don't translate well to print */
+    .project-card,
+    .timeline-content,
+    .skill-category {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    /* Ensure all content is visible */
+    .container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+    }
+}
+
+/* 
+ * Accessibility adjustments
+ * These help ensure the site is usable by people with disabilities
+ */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #0066cc;
+        --secondary-color: #008800;
+        --dark-color: #000000;
+        --light-color: #f0f0f0;
+        --text-color: #000000;
+        --border-color: #000000;
+    }
+    
+    a, button, input, .btn, .btn-small {
+        outline: 2px solid transparent;
+    }
+    
+    a:focus, button:focus, input:focus, .btn:focus, .btn-small:focus {
+        outline: 2px solid #000000;
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    /* Remove animations and transitions for users who prefer reduced motion */
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    html {
+        scroll-behavior: auto !important;
+    }
+}
