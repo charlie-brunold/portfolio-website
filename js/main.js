@@ -1,7 +1,7 @@
 /**
- * main.js - Main JavaScript functionality for portfolio website
- * This file contains all the JavaScript functionality needed for the portfolio website,
- * including form validation, navigation enhancements, and simple animations.
+ * main.js - Enhanced JavaScript functionality for portfolio website (Phase 2)
+ * This file contains improved functionality including smooth navigation, form validation,
+ * scroll animations, project filtering, and other interactive elements.
  */
 
 /**
@@ -15,12 +15,14 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeNavigation();
     initializeContactForm();
     initializeProjectFilters();
-    initializeAnimations();
+    initializeScrollAnimations();
+    initializeBackToTop();
+    initializeScrollSpy();
 });
 
 /**
  * Navigation functionality
- * Adds active class to current page in navigation and handles mobile menu
+ * Handles current page highlighting, scroll effects, and mobile menu toggle
  */
 function initializeNavigation() {
     console.log('Initializing navigation');
@@ -51,12 +53,107 @@ function initializeNavigation() {
         }
     });
     
-    // In the future, mobile navigation toggle can be added here
+    // Add header scroll effect
+    const header = document.querySelector('header');
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+    
+    // Mobile menu toggle
+    const navToggle = document.createElement('button');
+    navToggle.className = 'nav-toggle';
+    navToggle.setAttribute('aria-label', 'Toggle navigation menu');
+    navToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    
+    const nav = document.querySelector('nav');
+    const headerContainer = document.querySelector('header .container');
+    
+    // Create nav close button
+    const navClose = document.createElement('button');
+    navClose.className = 'nav-close';
+    navClose.setAttribute('aria-label', 'Close navigation menu');
+    navClose.innerHTML = '<i class="fas fa-times"></i>';
+    
+    // Create overlay for mobile menu
+    const navOverlay = document.createElement('div');
+    navOverlay.className = 'nav-overlay';
+    
+    // Append toggle button to header
+    headerContainer.appendChild(navToggle);
+    
+    // Append close button to nav
+    nav.appendChild(navClose);
+    
+    // Append overlay to body
+    document.body.appendChild(navOverlay);
+    
+    // Toggle mobile menu
+    navToggle.addEventListener('click', function() {
+        nav.classList.add('active');
+        navOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+    });
+    
+    // Close mobile menu when clicking close button
+    navClose.addEventListener('click', function() {
+        nav.classList.remove('active');
+        navOverlay.classList.remove('active');
+        document.body.style.overflow = ''; // Re-enable scrolling
+    });
+    
+    // Close mobile menu when clicking overlay
+    navOverlay.addEventListener('click', function() {
+        nav.classList.remove('active');
+        navOverlay.classList.remove('active');
+        document.body.style.overflow = ''; // Re-enable scrolling
+    });
+    
+    // Close mobile menu when clicking on a link
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            nav.classList.remove('active');
+            navOverlay.classList.remove('active');
+            document.body.style.overflow = ''; // Re-enable scrolling
+        });
+    });
+    
+    // Add smooth scrolling for anchor links
+    const anchorLinks = document.querySelectorAll('a[href^="#"]');
+    anchorLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Only if the href is not just "#" (empty anchor)
+            if (this.getAttribute('href') !== '#') {
+                e.preventDefault();
+                
+                // Get the target element
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    // Get the header height for offset
+                    const headerHeight = document.querySelector('header').offsetHeight;
+                    
+                    // Calculate the position to scroll to (with offset for header)
+                    const offsetTop = targetElement.offsetTop - headerHeight;
+                    
+                    // Scroll smoothly to the target
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        });
+    });
 }
 
 /**
- * Contact form validation and submission handling
- * Validates the form fields and prepares for submission
+ * Enhanced Contact form validation and submission handling
+ * Validates the form fields with more detailed feedback and prepares for submission
  */
 function initializeContactForm() {
     console.log('Initializing contact form');
@@ -65,177 +162,156 @@ function initializeContactForm() {
     const contactForm = document.getElementById('contactForm');
     
     if (contactForm) {
+        // Get all form fields
+        const formFields = contactForm.querySelectorAll('input, textarea');
+        
+        // Add validation for each field on blur
+        formFields.forEach(field => {
+            field.addEventListener('blur', function() {
+                validateField(field);
+            });
+            
+            // Also validate on input to remove error when fixed
+            field.addEventListener('input', function() {
+                if (field.value.trim() !== '') {
+                    validateField(field);
+                }
+            });
+        });
+        
         // Add submit event listener
         contactForm.addEventListener('submit', function(event) {
             // Prevent the default form submission behavior
             event.preventDefault();
             
             // Get all form fields
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const subject = document.getElementById('subject').value;
-            const message = document.getElementById('message').value;
+            const name = document.getElementById('name');
+            const email = document.getElementById('email');
+            const subject = document.getElementById('subject');
+            const message = document.getElementById('message');
             
-            // Validate form fields
-            if (validateContactForm(name, email, subject, message)) {
+            // Validate all fields
+            const isNameValid = validateField(name);
+            const isEmailValid = validateField(email);
+            const isSubjectValid = validateField(subject);
+            const isMessageValid = validateField(message);
+            
+            // If all fields are valid, proceed with form submission
+            if (isNameValid && isEmailValid && isSubjectValid && isMessageValid) {
                 console.log('Form validated successfully');
                 
-                // In a real implementation, the form would be submitted to a server
-                console.log('Form data:', { name, email, subject, message });
+                // Show a loading indicator
+                const submitBtn = contactForm.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                submitBtn.disabled = true;
                 
-                // Show a success message to the user
-                alert('Your message has been sent successfully!');
-                
-                // Reset the form
-                contactForm.reset();
+                // Simulate form submission (in a real implementation, this would be an AJAX call to a server)
+                setTimeout(() => {
+                    console.log('Form data:', { 
+                        name: name.value, 
+                        email: email.value, 
+                        subject: subject.value, 
+                        message: message.value 
+                    });
+                    
+                    // Show a success message
+                    showFormMessage('Your message has been sent successfully! I\'ll get back to you soon.', 'success');
+                    
+                    // Reset the form
+                    contactForm.reset();
+                    
+                    // Reset the button
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                }, 1500);
+            } else {
+                showFormMessage('Please fix the errors in the form.', 'error');
             }
         });
     }
 }
 
 /**
- * Validate contact form fields
- * @param {string} name - The user's name
- * @param {string} email - The user's email
- * @param {string} subject - The message subject
- * @param {string} message - The message content
- * @returns {boolean} - Whether the form is valid
+ * Show form submission message (success or error)
+ * @param {string} message - The message to display
+ * @param {string} type - The type of message ('success' or 'error')
  */
-function validateContactForm(name, email, subject, message) {
-    // Check if any field is empty
-    if (!name || !email || !subject || !message) {
-        alert('Please fill in all fields.');
-        return false;
+function showFormMessage(message, type) {
+    // Check if there's already a message
+    let messageEl = document.querySelector('.form-message');
+    
+    // If not, create one
+    if (!messageEl) {
+        messageEl = document.createElement('div');
+        messageEl.className = 'form-message';
+        const contactForm = document.getElementById('contactForm');
+        contactForm.parentNode.insertBefore(messageEl, contactForm.nextSibling);
     }
     
-    // Validate email format using a simple regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        alert('Please enter a valid email address.');
-        return false;
-    }
+    // Set the message content and class
+    messageEl.textContent = message;
+    messageEl.className = `form-message ${type}`;
     
-    // Check minimum message length
-    if (message.length < 10) {
-        alert('Message is too short. Please provide more details.');
-        return false;
-    }
+    // Add visible class to trigger animation
+    setTimeout(() => messageEl.classList.add('visible'), 10);
     
-    // If we reach here, the form is valid
-    return true;
-}
-
-/**
- * Project filtering functionality
- * Allows filtering projects by category
- */
-function initializeProjectFilters() {
-    console.log('Initializing project filters');
-    
-    // Find filter buttons - only proceed if they exist
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    
-    if (filterButtons.length > 0) {
-        // Find all project cards
-        const projectCards = document.querySelectorAll('.project-card');
-        
-        // Add click event listener to each filter button
-        filterButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Get the filter value
-                const filter = this.getAttribute('data-filter');
-                console.log(`Filter selected: ${filter}`);
-                
-                // Remove active class from all buttons
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                
-                // Add active class to current button
-                this.classList.add('active');
-                
-                // Show/hide projects based on filter
-                projectCards.forEach(card => {
-                    if (filter === 'all') {
-                        // Show all projects
-                        card.style.display = 'block';
-                    } else {
-                        // Check if card has the selected category
-                        if (card.getAttribute('data-category') === filter) {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    }
-                });
-            });
-        });
+    // Remove the message after a few seconds (for success messages)
+    if (type === 'success') {
+        setTimeout(() => {
+            messageEl.classList.remove('visible');
+            setTimeout(() => messageEl.remove(), 300);
+        }, 5000);
     }
 }
 
 /**
- * Simple animations for page elements
- * Adds subtle animations to improve user experience
+ * Validate a single form field
+ * @param {HTMLElement} field - The field to validate
+ * @returns {boolean} - Whether the field is valid
  */
-function initializeAnimations() {
-    console.log('Initializing animations');
+function validateField(field) {
+    // Get the field's parent (form-group)
+    const formGroup = field.closest('.form-group');
     
-    // Find all project cards
-    const projectCards = document.querySelectorAll('.project-card');
+    // Find or create the error message element
+    let errorElement = formGroup.querySelector('.error-message');
+    if (!errorElement) {
+        errorElement = document.createElement('div');
+        errorElement.className = 'error-message';
+        formGroup.appendChild(errorElement);
+    }
     
-    // Add animation class when they come into view
-    // This is a simple implementation that adds classes on page load
-    // In a more advanced version, you could use Intersection Observer API
-    setTimeout(() => {
-        projectCards.forEach((card, index) => {
-            // Stagger the animations slightly
-            setTimeout(() => {
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, index * 100);
-        });
-    }, 300);
+    // Default result is valid
+    let isValid = true;
+    let errorMessage = '';
     
-    // Add smooth scrolling for anchor links
-    const anchorLinks = document.querySelectorAll('a[href^="#"]');
-    anchorLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Get the target element
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            
-            if (targetElement) {
-                // Scroll smoothly to the target
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
+    // Different validation based on field type
+    if (field.value.trim() === '') {
+        // Field is empty
+        isValid = false;
+        errorMessage = `${field.getAttribute('placeholder') || field.name} is required`;
+    } else if (field.type === 'email') {
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(field.value)) {
+            isValid = false;
+            errorMessage = 'Please enter a valid email address';
+        }
+    } else if (field.id === 'message' && field.value.length < 10) {
+        // Message length validation
+        isValid = false;
+        errorMessage = 'Message is too short. Please provide more details.';
+    }
+    
+    // Update the UI based on validation result
+    if (isValid) {
+        formGroup.classList.remove('error');
+        errorElement.textContent = '';
+    } else {
+        formGroup.classList.add('error');
+        errorElement.textContent = errorMessage;
+    }
+    
+    return isValid;
 }
-
-/**
- * Helper function to check if an element is in the viewport
- * Used to trigger animations when scrolling
- * @param {HTMLElement} el - The element to check
- * @returns {boolean} - Whether the element is in the viewport
- */
-function isInViewport(el) {
-    const rect = el.getBoundingClientRect();
-    return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
-}
-
-/**
- * Additional functionality to be added in future phases:
- * 1. Dark/light mode toggle
- * 2. Image lazy loading
- * 3. More advanced animations
- * 4. Portfolio filtering with transitions
- * 5. Interactive data visualizations for skills
- */
