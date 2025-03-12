@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Showcase of data science and web development projects">
+    <title>Portfolio | Projects</title>
+    <!-- Link to normalize CSS to reset browser defaults -->
+    <link rel="stylesheet" href="css/normalize.css">
+    <!-- Link to main stylesheet -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Link to responsive styles -->
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Header section containing logo and navigation -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>My Portfolio</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="projects.html" class="active">Projects</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main content area -->
+    <main>
+        <!-- Projects intro section -->
+        <section class="projects-intro">
+            <div class="container">
+                <h2>My Projects</h2>
+                <p>Here's a collection of my data science and web development projects. Each demonstrates different skills and approaches to problem-solving.</p>
+                
+                <!-- Project filtering options - can be made functional with JavaScript later -->
+                <div class="project-filters">
+                    <button class="filter-btn active" data-filter="all">All Projects</button>
+                    <button class="filter-btn" data-filter="data-science">Data Science</button>
+                    <button class="filter-btn" data-filter="web-dev">Web Development</button>
+                    <button class="filter-btn" data-filter="visualization">Data Visualization</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects grid section -->
+        <section class="projects-grid-section">
+            <div class="container">
+                <div class="projects-grid">
+                    <!-- Replace with your actual projects -->
+                    <!-- Project 1 -->
+                    <div class="project-card" data-category="data-science">
+                        <div class="project-image">
+                            <!-- Placeholder for project image -->
+                            <div class="project-image-placeholder">
+                                <p>Project Image</p>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3>Example Project</h3>
+                            <p>Brief description of the project, approach, and technologies used.</p>
+                            <div class="project-tags">
+                                <span class="tag">Python</span>
+                                <span class="tag">Scikit-learn</span>
+                                <span class="tag">Pandas</span>
+                            </div>
+                            <div class="project-links">
+                                <a href="#" class="btn-small">View Project</a>
+                                <a href="#" class="btn-small">GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 2 -->
+                    <div class="project-card" data-category="data-science">
+                        <div class="project-image">
+                            <div class="project-image-placeholder">
+                                <p>Project Image</p>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3>Example Project</h3>
+                            <p>Brief description of the project, approach, and technologies used.</p>
+                            <div class="project-tags">
+                                <span class="tag">Python</span>
+                                <span class="tag">NLTK</span>
+                                <span class="tag">spaCy</span>
+                            </div>
+                            <div class="project-links">
+                                <a href="#" class="btn-small">View Project</a>
+                                <a href="#" class="btn-small">GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer section -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Charlie Brunold. All rights reserved.</p>
+            <div class="social-links">
+                <a href="https://github.com/charlie-brunold" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Link to JavaScript file -->
+    <script src="js/main.js"></script>
+</body>
+</html>
