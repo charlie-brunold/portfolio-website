@@ -1,7 +1,7 @@
 /**
  * main.js - Main JavaScript functionality for portfolio website
  * 
- * This file contains all core functionality including navigation, form validation,
+ * This file contains all core functionality including navigation, 
  * scroll animations, project filtering, and interactive elements.
  * 
  * The code is structured into modular functions for better organization and maintenance.
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize all functions
     initializeNavigation();
-    initializeContactForm();
+    // Note: Contact form is now initialized by contact-form.js
     initializeProjectFilters();
     initializeScrollAnimations();
     initializeBackToTop();
@@ -154,173 +154,6 @@ function initializeNavigation() {
 }
 
 /**
- * Contact form validation and submission handling
- * Only proceeds if the contact form element exists on the page
- */
-function initializeContactForm() {
-    console.log('Initializing contact form');
-    
-    // Find the contact form - only proceed if it exists
-    const contactForm = document.getElementById('contactForm');
-    
-    if (contactForm) {
-        // Get all form fields
-        const formFields = contactForm.querySelectorAll('input, textarea');
-        
-        // Add validation for each field on blur
-        formFields.forEach(field => {
-            field.addEventListener('blur', function() {
-                validateField(field);
-            });
-            
-            // Also validate on input to remove error when fixed
-            field.addEventListener('input', function() {
-                if (field.value.trim() !== '') {
-                    validateField(field);
-                }
-            });
-        });
-        
-        // Add submit event listener
-        contactForm.addEventListener('submit', function(event) {
-            // Prevent the default form submission behavior
-            event.preventDefault();
-            
-            // Get all form fields
-            const name = document.getElementById('name');
-            const email = document.getElementById('email');
-            const subject = document.getElementById('subject');
-            const message = document.getElementById('message');
-            
-            // Validate all fields
-            const isNameValid = validateField(name);
-            const isEmailValid = validateField(email);
-            const isSubjectValid = validateField(subject);
-            const isMessageValid = validateField(message);
-            
-            // If all fields are valid, proceed with form submission
-            if (isNameValid && isEmailValid && isSubjectValid && isMessageValid) {
-                console.log('Form validated successfully');
-                
-                // Show a loading indicator
-                const submitBtn = contactForm.querySelector('button[type="submit"]');
-                const originalBtnText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-                submitBtn.disabled = true;
-                
-                // Simulate form submission (in a real implementation, this would be an AJAX call to a server)
-                setTimeout(() => {
-                    console.log('Form data:', { 
-                        name: name.value, 
-                        email: email.value, 
-                        subject: subject.value, 
-                        message: message.value 
-                    });
-                    
-                    // Show a success message
-                    showFormMessage('Your message has been sent successfully! I\'ll get back to you soon.', 'success');
-                    
-                    // Reset the form
-                    contactForm.reset();
-                    
-                    // Reset the button
-                    submitBtn.innerHTML = originalBtnText;
-                    submitBtn.disabled = false;
-                }, 1500);
-            } else {
-                showFormMessage('Please fix the errors in the form.', 'error');
-            }
-        });
-    }
-}
-
-/**
- * Show form submission message (success or error)
- * @param {string} message - The message to display
- * @param {string} type - The type of message ('success' or 'error')
- */
-function showFormMessage(message, type) {
-    // Check if there's already a message
-    let messageEl = document.querySelector('.form-message');
-    
-    // If not, create one
-    if (!messageEl) {
-        messageEl = document.createElement('div');
-        messageEl.className = 'form-message';
-        const contactForm = document.getElementById('contactForm');
-        if (contactForm) {
-            contactForm.parentNode.insertBefore(messageEl, contactForm.nextSibling);
-        }
-    }
-    
-    // Set the message content and class
-    messageEl.textContent = message;
-    messageEl.className = `form-message ${type}`;
-    
-    // Add visible class to trigger animation
-    setTimeout(() => messageEl.classList.add('visible'), 10);
-    
-    // Remove the message after a few seconds (for success messages)
-    if (type === 'success') {
-        setTimeout(() => {
-            messageEl.classList.remove('visible');
-            setTimeout(() => messageEl.remove(), 300);
-        }, 5000);
-    }
-}
-
-/**
- * Validate a single form field
- * @param {HTMLElement} field - The field to validate
- * @returns {boolean} - Whether the field is valid
- */
-function validateField(field) {
-    // Get the field's parent (form-group)
-    const formGroup = field.closest('.form-group');
-    
-    // Find or create the error message element
-    let errorElement = formGroup.querySelector('.error-message');
-    if (!errorElement) {
-        errorElement = document.createElement('div');
-        errorElement.className = 'error-message';
-        formGroup.appendChild(errorElement);
-    }
-    
-    // Default result is valid
-    let isValid = true;
-    let errorMessage = '';
-    
-    // Different validation based on field type
-    if (field.value.trim() === '') {
-        // Field is empty
-        isValid = false;
-        errorMessage = `${field.getAttribute('placeholder') || field.name} is required`;
-    } else if (field.type === 'email') {
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(field.value)) {
-            isValid = false;
-            errorMessage = 'Please enter a valid email address';
-        }
-    } else if (field.id === 'message' && field.value.length < 10) {
-        // Message length validation
-        isValid = false;
-        errorMessage = 'Message is too short. Please provide more details.';
-    }
-    
-    // Update the UI based on validation result
-    if (isValid) {
-        formGroup.classList.remove('error');
-        errorElement.textContent = '';
-    } else {
-        formGroup.classList.add('error');
-        errorElement.textContent = errorMessage;
-    }
-    
-    return isValid;
-}
-
-/**
  * Project filtering functionality
  * Adds click handlers to filter buttons to show/hide projects
  */
@@ -349,16 +182,44 @@ function initializeProjectFilters() {
                 projectCards.forEach(card => {
                     if (filter === 'all') {
                         card.style.display = 'flex';
+                        // Add fade-in animation
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, 100);
                     } else {
                         const category = card.getAttribute('data-category');
                         if (category === filter) {
                             card.style.display = 'flex';
+                            // Add fade-in animation
+                            setTimeout(() => {
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0)';
+                            }, 100);
                         } else {
-                            card.style.display = 'none';
+                            // Add fade-out animation then hide
+                            card.style.opacity = '0';
+                            card.style.transform = 'translateY(20px)';
+                            setTimeout(() => {
+                                card.style.display = 'none';
+                            }, 300);
                         }
                     }
                 });
             });
+        });
+        
+        // Ensure all projects are visible initially with animation
+        projectCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.3s ease';
+            
+            // Stagger the animations
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100 + (index * 50));
         });
     }
 }
