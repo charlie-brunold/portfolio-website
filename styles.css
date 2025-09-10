@@ -69,6 +69,7 @@ body {
   font-weight: 600;
   font-size: 18px;
   color: var(--text-color);
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
 }
 
 .nav-links {
@@ -81,6 +82,7 @@ body {
   text-decoration: none;
   font-weight: 400;
   transition: color 0.2s ease;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
 }
 
 .nav-link:hover {
