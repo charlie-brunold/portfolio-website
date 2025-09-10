@@ -1,8 +1,8 @@
 // Word-by-word animation on page load
 function animateTitle() {
     const titleElement = document.getElementById('animated-title');
-    const titleText = titleElement.textContent;
-    const words = titleText.split(' ');
+    const originalText = "I'm Charlie, a software engineer building thoughtful digital experiences.";
+    const words = originalText.split(' ');
     
     // Nonlinear timing pattern for more visual interest
     // Creates varied pacing: quick, pause, quick-quick, pause, etc.
@@ -22,13 +22,53 @@ function animateTitle() {
     titleElement.innerHTML = '';
     words.forEach((word, index) => {
         const wordSpan = document.createElement('span');
-        wordSpan.textContent = word;
         wordSpan.className = 'word';
+        
+        // Special handling for "Charlie," - add the 3D hover effect
+        if (word === "Charlie,") {
+            const charlieSpan = document.createElement('span');
+            charlieSpan.id = 'charlie-3d';
+            charlieSpan.className = 'charlie-hover';
+            charlieSpan.textContent = 'Charlie';
+            wordSpan.appendChild(charlieSpan);
+            wordSpan.appendChild(document.createTextNode(','));
+        } else {
+            wordSpan.textContent = word;
+        }
+        
         // Use the timing pattern, or fallback to linear if we have more words than expected
         const delay = timingPattern[index] || (index * 0.15);
         wordSpan.style.animationDelay = `${delay}s`;
         titleElement.appendChild(wordSpan);
     });
+    
+    // Setup 3D effect for Charlie after animation
+    setTimeout(() => {
+        setup3DCharlie();
+    }, 3000); // Wait for title animation to complete
+}
+
+// 3D Charlie hover effect setup
+function setup3DCharlie() {
+    const charlieElement = document.getElementById('charlie-3d');
+    if (!charlieElement) return;
+    
+    const word = charlieElement.innerText.split("");
+    charlieElement.innerHTML = "";
+    
+    // Create first div with original letters
+    const firstDiv = document.createElement('div');
+    word.forEach((letter, idx) => {
+        const span = document.createElement('span');
+        span.textContent = letter;
+        span.style.setProperty('--index', idx);
+        firstDiv.appendChild(span);
+    });
+    charlieElement.appendChild(firstDiv);
+    
+    // Create cloned div for 3D effect (CSS handles positioning)
+    const cloneDiv = firstDiv.cloneNode(true);
+    charlieElement.appendChild(cloneDiv);
 }
 
 // Smooth scrolling for navigation links
