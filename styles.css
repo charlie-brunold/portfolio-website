@@ -183,51 +183,38 @@ body {
   transform: translate3d(0, 0%, 0) rotateX(0deg);
 }
 
-/* 3D Skill Hover Effect */
-.skill-hover {
+/* Skill Rolodex Animation */
+.skill-rolodex {
   position: relative;
   display: inline-block;
-  cursor: pointer;
   white-space: nowrap;
-  min-width: 6.2ch; /* Ensure enough space for "Python" */
+  min-width: 8ch; /* Ensure enough space for longest skill */
+  height: 1em; /* Exact height to match font size */
+  overflow: hidden;
+  vertical-align: baseline; /* Align with text baseline */
 }
 
-.skill-hover > div {
-  position: relative;
-}
-
-.skill-hover > div:nth-child(2) {
+.skill-display {
   position: absolute;
+  top: 1em; /* Start exactly one em below (below the visible container) */
   left: 0;
-  top: 0;
   width: 100%;
-  height: 100%;
-}
-
-.skill-hover > div span {
-  will-change: transform;
-  transform-style: preserve-3d;
-  transition: 0.5s;
-  transition-delay: calc(0.05s * var(--index));
   display: inline-block;
-  position: relative;
+  transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+  will-change: transform;
+  line-height: 1; /* Match exact line height */
 }
 
-.skill-hover > div:nth-child(1) span {
-  transform-origin: bottom;
+.skill-entering {
+  transform: translateY(0%); /* Starting position (below container due to top: 1em) */
 }
 
-.skill-hover > div:nth-child(2) span {
-  transform-origin: top;
-  transform: translate3d(0, 100%, 0) rotateX(-90deg);
+.skill-active {
+  transform: translateY(-1em); /* Move up exactly to visible area */
 }
 
-.skill-hover:hover > div:nth-child(1) span {
-  transform: translate3d(0, -100%, 0) rotateX(-90deg);
-}
-
-.skill-hover:hover > div:nth-child(2) span {
-  transform: translate3d(0, 0%, 0) rotateX(0deg);
+.skill-exiting {
+  transform: translateY(-2em); /* Move up and out of view */
 }
 
 

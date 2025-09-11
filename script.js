@@ -1,7 +1,7 @@
 // Word-by-word animation on page load
 function animateTitle() {
     const titleElement = document.getElementById('animated-title');
-    const originalText = "Hey, I'm Charlie, an AI for Business student using Python to solve complex business problems.";
+    const originalText = "Hey, I'm Charlie, an AI for Business student using <skill-rolodex></skill-rolodex> to solve complex business problems.";
     const words = originalText.split(' ');
     
     // Nonlinear timing pattern for more visual interest
@@ -16,7 +16,7 @@ function animateTitle() {
         1.2,    // "Business" - quick
         1.5,    // "student" - medium pause
         1.7,    // "using" - quick
-        1.9,    // "Python" - quick
+        1.9,    // "<skill-rolodex></skill-rolodex>" - quick
         2.4,    // "to" - longer pause
         2.5,    // "solve" - quick
         2.7,    // "complex" - quick
@@ -39,13 +39,12 @@ function animateTitle() {
             wordSpan.appendChild(charlieSpan);
             wordSpan.appendChild(document.createTextNode(','));
         }
-        // Special handling for "Python" - add the 3D hover effect for skills
-        else if (word === "Python") {
-            const skillSpan = document.createElement('span');
-            skillSpan.id = 'skill-3d';
-            skillSpan.className = 'skill-hover';
-            skillSpan.textContent = 'Python';
-            wordSpan.appendChild(skillSpan);
+        // Special handling for skill rolodex placeholder
+        else if (word === "<skill-rolodex></skill-rolodex>") {
+            const rolodexContainer = document.createElement('span');
+            rolodexContainer.id = 'skill-rolodex';
+            rolodexContainer.className = 'skill-rolodex';
+            wordSpan.appendChild(rolodexContainer);
         } else {
             wordSpan.textContent = word;
         }
@@ -59,7 +58,7 @@ function animateTitle() {
     // Setup 3D effects after animation
     setTimeout(() => {
         setup3DCharlie();
-        setup3DSkill();
+        setupSkillRolodex();
     }, 4000); // Wait for title animation to complete
 }
 
@@ -93,34 +92,59 @@ function setup3DCharlie() {
     charlieElement.appendChild(secondDiv);
 }
 
-// 3D Skill hover effect setup
-function setup3DSkill() {
-    const skillElement = document.getElementById('skill-3d');
-    if (!skillElement) return;
+// Skill Rolodex Animation Setup
+function setupSkillRolodex() {
+    const rolodexElement = document.getElementById('skill-rolodex');
+    if (!rolodexElement) return;
     
-    const word = skillElement.innerText.split("");
-    skillElement.innerHTML = "";
+    // Skills array - easily expandable
+    const skills = ['Python', 'SQL', 'JavaScript', 'R', 'Tableau', 'Power BI'];
+    let currentIndex = 0;
     
-    // Create first div with original letters (Python)
-    const firstDiv = document.createElement('div');
-    word.forEach((letter, idx) => {
-        const span = document.createElement('span');
-        span.textContent = letter;
-        span.style.setProperty('--index', idx);
-        firstDiv.appendChild(span);
-    });
-    skillElement.appendChild(firstDiv);
+    // Create the skill display element
+    const skillDisplay = document.createElement('span');
+    skillDisplay.className = 'skill-display skill-active'; // Start in active position
+    skillDisplay.textContent = skills[0];
+    rolodexElement.appendChild(skillDisplay);
     
-    // Create second div with "SQL" for 3D effect
-    const secondDiv = document.createElement('div');
-    const sqlLetters = "SQL".split("");
-    sqlLetters.forEach((letter, idx) => {
-        const span = document.createElement('span');
-        span.textContent = letter;
-        span.style.setProperty('--index', idx);
-        secondDiv.appendChild(span);
-    });
-    skillElement.appendChild(secondDiv);
+    // Function to animate to next skill
+    function animateNextSkill() {
+        currentIndex = (currentIndex + 1) % skills.length;
+        const nextSkill = skills[currentIndex];
+        
+        // Create new skill element for incoming animation
+        const newSkillElement = document.createElement('span');
+        newSkillElement.className = 'skill-display skill-entering';
+        newSkillElement.textContent = nextSkill;
+        rolodexElement.appendChild(newSkillElement);
+        
+        // Animate current skill out (upward)
+        skillDisplay.classList.add('skill-exiting');
+        
+        // Animate new skill in (from below)
+        requestAnimationFrame(() => {
+            newSkillElement.classList.remove('skill-entering');
+            newSkillElement.classList.add('skill-active');
+        });
+        
+        // Clean up after animation
+        setTimeout(() => {
+            if (skillDisplay.parentNode) {
+                skillDisplay.parentNode.removeChild(skillDisplay);
+            }
+            skillDisplay.className = 'skill-display skill-active';
+            skillDisplay.textContent = nextSkill;
+            
+            // Remove the temporary element and update reference
+            if (newSkillElement.parentNode) {
+                newSkillElement.parentNode.removeChild(newSkillElement);
+            }
+            rolodexElement.appendChild(skillDisplay);
+        }, 600); // Match animation duration
+    }
+    
+    // Start the continuous animation
+    setInterval(animateNextSkill, 2800); // Change skill every 2.8 seconds
 }
 
 // Smooth scrolling for navigation links
