@@ -101,6 +101,26 @@ function setupSkillRolodex() {
     const skills = ['Python', 'SQL', 'JavaScript', 'R', 'Tableau', 'Power BI'];
     let currentIndex = 0;
     
+    // Create hidden measurement element that inherits title styling
+    const measureElement = document.createElement('span');
+    measureElement.className = 'skill-measure';
+    rolodexElement.appendChild(measureElement);
+    
+    // Get computed font size for accurate padding calculations
+    const computedStyle = window.getComputedStyle(rolodexElement);
+    const fontSize = parseFloat(computedStyle.fontSize);
+    const paddingEm = 0.4; // Total horizontal padding (0.2em * 2)
+    const paddingPx = paddingEm * fontSize;
+    
+    // Pre-calculate widths for all skills (including responsive padding)
+    const skillWidths = skills.map(skill => {
+        measureElement.textContent = skill;
+        return measureElement.getBoundingClientRect().width + paddingPx;
+    });
+    
+    // Set initial width
+    rolodexElement.style.width = skillWidths[0] + 'px';
+    
     // Create the skill display element
     const skillDisplay = document.createElement('span');
     skillDisplay.className = 'skill-display skill-active'; // Start in active position
@@ -111,40 +131,54 @@ function setupSkillRolodex() {
     function animateNextSkill() {
         currentIndex = (currentIndex + 1) % skills.length;
         const nextSkill = skills[currentIndex];
+        const nextWidth = skillWidths[currentIndex];
         
-        // Create new skill element for incoming animation
-        const newSkillElement = document.createElement('span');
-        newSkillElement.className = 'skill-display skill-entering';
-        newSkillElement.textContent = nextSkill;
-        rolodexElement.appendChild(newSkillElement);
+        // Start width animation slightly before text animation for smooth feel
+        rolodexElement.style.width = nextWidth + 'px';
         
-        // Animate current skill out (upward)
-        skillDisplay.classList.add('skill-exiting');
-        
-        // Animate new skill in (from below)
-        requestAnimationFrame(() => {
-            newSkillElement.classList.remove('skill-entering');
-            newSkillElement.classList.add('skill-active');
-        });
-        
-        // Clean up after animation
+        // Small delay to let width animation start, then animate text
         setTimeout(() => {
-            if (skillDisplay.parentNode) {
-                skillDisplay.parentNode.removeChild(skillDisplay);
-            }
-            skillDisplay.className = 'skill-display skill-active';
-            skillDisplay.textContent = nextSkill;
+            // Create new skill element for incoming animation
+            const newSkillElement = document.createElement('span');
+            newSkillElement.className = 'skill-display skill-entering';
+            newSkillElement.textContent = nextSkill;
+            rolodexElement.appendChild(newSkillElement);
             
-            // Remove the temporary element and update reference
-            if (newSkillElement.parentNode) {
-                newSkillElement.parentNode.removeChild(newSkillElement);
-            }
-            rolodexElement.appendChild(skillDisplay);
-        }, 600); // Match animation duration
+            // Animate current skill out (upward)
+            skillDisplay.classList.add('skill-exiting');
+            
+            // Animate new skill in (from below)
+            requestAnimationFrame(() => {
+                newSkillElement.classList.remove('skill-entering');
+                newSkillElement.classList.add('skill-active');
+            });
+            // Clean up after animation
+            setTimeout(() => {
+                if (skillDisplay.parentNode) {
+                    skillDisplay.parentNode.removeChild(skillDisplay);
+                }
+                skillDisplay.className = 'skill-display skill-active';
+                skillDisplay.textContent = nextSkill;
+                
+                // Remove the temporary element and update reference
+                if (newSkillElement.parentNode) {
+                    newSkillElement.parentNode.removeChild(newSkillElement);
+                }
+                rolodexElement.appendChild(skillDisplay);
+            }, 600); // Match animation duration
+        }, 100); // Small delay to let width animation lead
     }
     
     // Start the continuous animation
     setInterval(animateNextSkill, 2800); // Change skill every 2.8 seconds
+    
+    // Cleanup: Remove measurement element (optional, but clean)
+    // Could be removed immediately since we have all measurements
+    setTimeout(() => {
+        if (measureElement.parentNode) {
+            measureElement.parentNode.removeChild(measureElement);
+        }
+    }, 1000);
 }
 
 // Smooth scrolling for navigation links
