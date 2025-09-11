@@ -1,21 +1,27 @@
 // Word-by-word animation on page load
 function animateTitle() {
     const titleElement = document.getElementById('animated-title');
-    const originalText = "I'm Charlie, a software engineer building thoughtful digital experiences.";
+    const originalText = "Hey, I'm Charlie, an AI for Business student using Python to solve complex business problems.";
     const words = originalText.split(' ');
     
     // Nonlinear timing pattern for more visual interest
     // Creates varied pacing: quick, pause, quick-quick, pause, etc.
     const timingPattern = [
-        0,      // "I'm" - immediate
-        0.2,    // "Charlie," - quick
-        0.7,    // "a" - longer pause
-        0.9,    // "software" - quick
-        1.0,    // "engineer" - very quick
-        1.4,    // "building" - medium pause
-        1.6,    // "thoughtful" - quick
-        2.1,    // "digital" - longer pause
-        2.4     // "experiences." - medium
+        0,      // "Hey," - immediate
+        0.2,    // "I'm" - quick
+        0.4,    // "Charlie," - quick
+        0.9,    // "an" - longer pause
+        1.0,    // "AI" - quick
+        1.1,    // "for" - very quick
+        1.2,    // "Business" - quick
+        1.5,    // "student" - medium pause
+        1.7,    // "using" - quick
+        1.9,    // "Python" - quick
+        2.4,    // "to" - longer pause
+        2.5,    // "solve" - quick
+        2.7,    // "complex" - quick
+        2.9,    // "business" - quick
+        3.2     // "problems." - medium
     ];
     
     // Clear the original text and wrap each word in a span
@@ -32,6 +38,14 @@ function animateTitle() {
             charlieSpan.textContent = 'Charlie';
             wordSpan.appendChild(charlieSpan);
             wordSpan.appendChild(document.createTextNode(','));
+        }
+        // Special handling for "Python" - add the 3D hover effect for skills
+        else if (word === "Python") {
+            const skillSpan = document.createElement('span');
+            skillSpan.id = 'skill-3d';
+            skillSpan.className = 'skill-hover';
+            skillSpan.textContent = 'Python';
+            wordSpan.appendChild(skillSpan);
         } else {
             wordSpan.textContent = word;
         }
@@ -42,10 +56,11 @@ function animateTitle() {
         titleElement.appendChild(wordSpan);
     });
     
-    // Setup 3D effect for Charlie after animation
+    // Setup 3D effects after animation
     setTimeout(() => {
         setup3DCharlie();
-    }, 3000); // Wait for title animation to complete
+        setup3DSkill();
+    }, 4000); // Wait for title animation to complete
 }
 
 // 3D Charlie hover effect setup
@@ -56,7 +71,7 @@ function setup3DCharlie() {
     const word = charlieElement.innerText.split("");
     charlieElement.innerHTML = "";
     
-    // Create first div with original letters
+    // Create first div with original letters (Charlie)
     const firstDiv = document.createElement('div');
     word.forEach((letter, idx) => {
         const span = document.createElement('span');
@@ -66,9 +81,46 @@ function setup3DCharlie() {
     });
     charlieElement.appendChild(firstDiv);
     
-    // Create cloned div for 3D effect (CSS handles positioning)
-    const cloneDiv = firstDiv.cloneNode(true);
-    charlieElement.appendChild(cloneDiv);
+    // Create second div with "Brunold" for 3D effect
+    const secondDiv = document.createElement('div');
+    const brunoldLetters = "Brunold".split("");
+    brunoldLetters.forEach((letter, idx) => {
+        const span = document.createElement('span');
+        span.textContent = letter;
+        span.style.setProperty('--index', idx);
+        secondDiv.appendChild(span);
+    });
+    charlieElement.appendChild(secondDiv);
+}
+
+// 3D Skill hover effect setup
+function setup3DSkill() {
+    const skillElement = document.getElementById('skill-3d');
+    if (!skillElement) return;
+    
+    const word = skillElement.innerText.split("");
+    skillElement.innerHTML = "";
+    
+    // Create first div with original letters (Python)
+    const firstDiv = document.createElement('div');
+    word.forEach((letter, idx) => {
+        const span = document.createElement('span');
+        span.textContent = letter;
+        span.style.setProperty('--index', idx);
+        firstDiv.appendChild(span);
+    });
+    skillElement.appendChild(firstDiv);
+    
+    // Create second div with "SQL" for 3D effect
+    const secondDiv = document.createElement('div');
+    const sqlLetters = "SQL".split("");
+    sqlLetters.forEach((letter, idx) => {
+        const span = document.createElement('span');
+        span.textContent = letter;
+        span.style.setProperty('--index', idx);
+        secondDiv.appendChild(span);
+    });
+    skillElement.appendChild(secondDiv);
 }
 
 // Smooth scrolling for navigation links
