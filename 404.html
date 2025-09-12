@@ -26,9 +26,9 @@
         </div>
     </main>
 
-    <footer class="bottom-footer">
+    <!-- <footer class="bottom-footer">
         <p class="last-updated">Last updated September 2025</p>
-    </footer>
+    </footer> -->
 
     <script>
         class ScrambleText {
@@ -138,13 +138,13 @@
             new ScrambleText(textElement, { duration: 3000 });
         });
 
-        // Re-trigger animation on page visibility change (when user returns to tab)
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                const textElement = document.getElementById('scramble-text');
-                new ScrambleText(textElement, { duration: 3000 });
-            }
-        });
+        // // Re-trigger animation on page visibility change (when user returns to tab)
+        // document.addEventListener('visibilitychange', () => {
+        //     if (!document.hidden) {
+        //         const textElement = document.getElementById('scramble-text');
+        //         new ScrambleText(textElement, { duration: 3000 });
+        //     }
+        // });
     </script>
 </body>
 </html>
