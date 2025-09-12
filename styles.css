@@ -260,6 +260,30 @@ body {
   100% { transform: translateY(0px); }
 }
 
+/* 404 Page Styles */
+.error-message {
+  font-size: 18px;
+  color: var(--secondary-color);
+  margin: var(--spacing) 0;
+  line-height: 1.6;
+}
+
+.back-link {
+  display: inline-block;
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: var(--spacing);
+  padding: 12px 0;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
+}
+
+.back-link:hover {
+  border-bottom-color: var(--text-color);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .navigation {
