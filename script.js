@@ -55,10 +55,15 @@ function animateTitle() {
         titleElement.appendChild(wordSpan);
     });
     
+    // Pre-initialize skill rolodex early so it's ready when its word appears
+    // Initialize it after a short delay to allow DOM to settle, but well before the skill word (1.9s)
+    setTimeout(() => {
+        setupSkillRolodex();
+    }, 500); // Initialize at 0.5s, ready for 1.9s appearance
+    
     // Setup 3D effects after animation
     setTimeout(() => {
         setup3DCharlie();
-        setupSkillRolodex();
     }, 4000); // Wait for title animation to complete
 }
 
@@ -122,11 +127,14 @@ function setupSkillRolodex() {
     // Set initial width
     rolodexElement.style.width = skillWidths[0] + 'px';
     
-    // Create the skill display element
-    const skillDisplay = document.createElement('span');
-    skillDisplay.className = 'skill-display skill-active'; // Start in active position
-    skillDisplay.textContent = skills[0];
-    rolodexElement.appendChild(skillDisplay);
+    // Get or create the skill display element (it might already exist from initial setup)
+    let skillDisplay = rolodexElement.querySelector('.skill-display');
+    if (!skillDisplay) {
+        skillDisplay = document.createElement('span');
+        skillDisplay.className = 'skill-display skill-active';
+        skillDisplay.textContent = skills[0];
+        rolodexElement.appendChild(skillDisplay);
+    }
     
     
     // Function to animate to next skill
