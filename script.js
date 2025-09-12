@@ -30,14 +30,9 @@ function animateTitle() {
         const wordSpan = document.createElement('span');
         wordSpan.className = 'word';
         
-        // Special handling for "Charlie," - add the 3D hover effect
+        // Special handling for "Charlie," - just regular text now
         if (word === "Charlie,") {
-            const charlieSpan = document.createElement('span');
-            charlieSpan.id = 'charlie-3d';
-            charlieSpan.className = 'charlie-hover';
-            charlieSpan.textContent = 'Charlie';
-            wordSpan.appendChild(charlieSpan);
-            wordSpan.appendChild(document.createTextNode(','));
+            wordSpan.textContent = word;
         }
         // Special handling for skill rolodex placeholder
         else if (word === "<skill-rolodex></skill-rolodex>") {
@@ -61,41 +56,8 @@ function animateTitle() {
         setupSkillRolodex();
     }, 500); // Initialize at 0.5s, ready for 1.9s appearance
     
-    // Setup 3D effects after animation
-    setTimeout(() => {
-        setup3DCharlie();
-    }, 4000); // Wait for title animation to complete
 }
 
-// 3D Charlie hover effect setup
-function setup3DCharlie() {
-    const charlieElement = document.getElementById('charlie-3d');
-    if (!charlieElement) return;
-    
-    const word = charlieElement.innerText.split("");
-    charlieElement.innerHTML = "";
-    
-    // Create first div with original letters (Charlie)
-    const firstDiv = document.createElement('div');
-    word.forEach((letter, idx) => {
-        const span = document.createElement('span');
-        span.textContent = letter;
-        span.style.setProperty('--index', idx);
-        firstDiv.appendChild(span);
-    });
-    charlieElement.appendChild(firstDiv);
-    
-    // Create second div with "Brunold" for 3D effect
-    const secondDiv = document.createElement('div');
-    const brunoldLetters = "Brunold".split("");
-    brunoldLetters.forEach((letter, idx) => {
-        const span = document.createElement('span');
-        span.textContent = letter;
-        span.style.setProperty('--index', idx);
-        secondDiv.appendChild(span);
-    });
-    charlieElement.appendChild(secondDiv);
-}
 
 // Skill Rolodex Animation Setup
 function setupSkillRolodex() {
