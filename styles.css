@@ -188,34 +188,36 @@ body {
   position: relative;
   display: inline-block;
   white-space: nowrap;
-  height: 1em; /* Exact height to match font size */
+  height: 1em; /* Keep original height */
   overflow: hidden;
   vertical-align: baseline; /* Align with text baseline */
   transition: width 0.5s cubic-bezier(0.4, 0.0, 0.2, 1); /* Smooth width transitions */
   padding: 0 0.2em; /* Add horizontal padding for breathing room */
+  transform: translateY(0.15em); /* Lower the entire container */
 }
 
 .skill-display {
   position: absolute;
-  top: 1em; /* Start exactly one em below (below the visible container) */
+  top: 50%; /* Center vertically in container */
   left: 0.2em; /* Offset for left padding */
   width: calc(100% - 0.4em); /* Account for total horizontal padding */
   display: inline-block;
   transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
   will-change: transform;
-  line-height: 1; /* Match exact line height */
+  line-height: inherit; /* Inherit parent line height for proper alignment */
+  transform: translateY(-50%); /* Center vertically */
 }
 
 .skill-entering {
-  transform: translateY(0%); /* Starting position (below container due to top: 1em) */
+  transform: translateY(50%); /* Starting position - below container */
 }
 
 .skill-active {
-  transform: translateY(-1em); /* Move up exactly to visible area */
+  transform: translateY(-50%); /* Center vertically in container */
 }
 
 .skill-exiting {
-  transform: translateY(-2em); /* Move up and out of view */
+  transform: translateY(-150%); /* Move up and out of view */
 }
 
 /* Hidden element for measuring text width */

@@ -97,6 +97,9 @@ function setupSkillRolodex() {
     const rolodexElement = document.getElementById('skill-rolodex');
     if (!rolodexElement) return;
     
+    // TEMPORARY DEBUG LOGGING - REMOVE WHEN FIXED
+    console.log('=== SKILL ROLODEX DEBUG INFO ===');
+    
     // Skills array - easily expandable
     const skills = ['Python', 'SQL', 'JavaScript', 'R', 'Tableau', 'Power BI'];
     let currentIndex = 0;
@@ -126,6 +129,71 @@ function setupSkillRolodex() {
     skillDisplay.className = 'skill-display skill-active'; // Start in active position
     skillDisplay.textContent = skills[0];
     rolodexElement.appendChild(skillDisplay);
+    
+    // TEMPORARY DEBUG LOGGING - Position tracking
+    setTimeout(() => {
+        const rolodexRect = rolodexElement.getBoundingClientRect();
+        const skillRect = skillDisplay.getBoundingClientRect();
+        const parentWordRect = rolodexElement.parentElement.getBoundingClientRect();
+        const titleRect = document.getElementById('animated-title').getBoundingClientRect();
+        
+        console.log('Rolodex Container:', {
+            element: rolodexElement,
+            rect: rolodexRect,
+            computedStyle: {
+                position: getComputedStyle(rolodexElement).position,
+                display: getComputedStyle(rolodexElement).display,
+                verticalAlign: getComputedStyle(rolodexElement).verticalAlign,
+                height: getComputedStyle(rolodexElement).height,
+                lineHeight: getComputedStyle(rolodexElement).lineHeight,
+                fontSize: getComputedStyle(rolodexElement).fontSize
+            }
+        });
+        
+        console.log('Skill Display:', {
+            element: skillDisplay,
+            rect: skillRect,
+            computedStyle: {
+                position: getComputedStyle(skillDisplay).position,
+                top: getComputedStyle(skillDisplay).top,
+                transform: getComputedStyle(skillDisplay).transform,
+                lineHeight: getComputedStyle(skillDisplay).lineHeight,
+                fontSize: getComputedStyle(skillDisplay).fontSize
+            }
+        });
+        
+        console.log('Parent Word Span:', {
+            element: rolodexElement.parentElement,
+            rect: parentWordRect,
+            computedStyle: {
+                display: getComputedStyle(rolodexElement.parentElement).display,
+                verticalAlign: getComputedStyle(rolodexElement.parentElement).verticalAlign,
+                lineHeight: getComputedStyle(rolodexElement.parentElement).lineHeight
+            }
+        });
+        
+        console.log('Title Container:', {
+            element: document.getElementById('animated-title'),
+            rect: titleRect,
+            computedStyle: {
+                lineHeight: getComputedStyle(document.getElementById('animated-title')).lineHeight,
+                fontSize: getComputedStyle(document.getElementById('animated-title')).fontSize
+            }
+        });
+        
+        // Calculate alignment differences
+        const skillCenterY = skillRect.top + skillRect.height / 2;
+        const parentCenterY = parentWordRect.top + parentWordRect.height / 2;
+        const alignmentDiff = skillCenterY - parentCenterY;
+        
+        console.log('Vertical Alignment Analysis:', {
+            skillCenterY,
+            parentCenterY,
+            alignmentDifference: alignmentDiff,
+            isAligned: Math.abs(alignmentDiff) < 1
+        });
+        
+    }, 100); // Small delay to ensure elements are rendered
     
     // Function to animate to next skill
     function animateNextSkill() {
