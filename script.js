@@ -237,4 +237,118 @@ document.addEventListener('DOMContentLoaded', function() {
         
         lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
     });
+
+    // Footer word bobbing animation
+    setupFooterAnimation();
 });
+
+function setupFooterAnimation() {
+    const footerText = document.getElementById('footer-text');
+    
+    if (!footerText) return;
+    
+    // Wrap each character in a span for individual animation
+    const originalText = footerText.textContent;
+    footerText.innerHTML = '';
+    
+    [...originalText].forEach(char => {
+        const letterSpan = document.createElement('span');
+        letterSpan.className = 'footer-letter';
+        
+        if (char === ' ') {
+            letterSpan.className += ' space';
+            letterSpan.innerHTML = '&nbsp;';
+        } else {
+            letterSpan.textContent = char;
+        }
+        
+        footerText.appendChild(letterSpan);
+    });
+    
+    const footerLetters = document.querySelectorAll('.footer-letter');
+    
+    let hoverTimeout;
+    let settleTimeout;
+    let cycleInterval;
+    let isHovering = false;
+    
+    function triggerBobbingWave() {
+        // Clear any existing settle animations
+        footerLetters.forEach(letter => {
+            letter.classList.remove('settling');
+        });
+        
+        // Animate letters sequentially with slight delay
+        footerLetters.forEach((letter, index) => {
+            setTimeout(() => {
+                letter.classList.remove('settling');
+                letter.classList.add('bobbing');
+                
+                // Remove bobbing class after animation completes
+                setTimeout(() => {
+                    if (isHovering) {
+                        letter.classList.remove('bobbing');
+                    }
+                }, 1200); // Match animation duration
+            }, index * 60); // 60ms delay between letters for smoother wave effect
+        });
+    }
+    
+    function startContinuousCycling() {
+        if (cycleInterval) return; // Already cycling
+        
+        // Trigger first wave immediately
+        triggerBobbingWave();
+        
+        // Set up continuous cycling
+        cycleInterval = setInterval(() => {
+            if (isHovering) {
+                triggerBobbingWave();
+            } else {
+                // Stop cycling immediately when not hovering
+                clearInterval(cycleInterval);
+                cycleInterval = null;
+            }
+        }, 1800); // Cycle every 1.8 seconds for more relaxed timing
+    }
+    
+    function startImmediateSettling() {
+        // Clear cycling immediately
+        if (cycleInterval) {
+            clearInterval(cycleInterval);
+            cycleInterval = null;
+        }
+        
+        // Start settling animation for all letters, regardless of their current state
+        footerLetters.forEach((letter, index) => {
+            setTimeout(() => {
+                letter.classList.remove('bobbing');
+                letter.classList.add('settling');
+                
+                // Remove settling class after animation completes
+                setTimeout(() => {
+                    letter.classList.remove('settling');
+                }, 2400); // Match settling animation duration
+            }, index * 30); // Slower sequence for smoother settling
+        });
+    }
+    
+    // Mouse enter - start continuous cycling
+    footerText.addEventListener('mouseenter', () => {
+        clearTimeout(hoverTimeout);
+        clearTimeout(settleTimeout);
+        
+        isHovering = true;
+        startContinuousCycling();
+    });
+    
+    // Mouse leave - immediately start settling
+    footerText.addEventListener('mouseleave', () => {
+        isHovering = false;
+        
+        // Small delay to allow any in-progress letter animations to complete naturally
+        hoverTimeout = setTimeout(() => {
+            startImmediateSettling();
+        }, 50);
+    });
+}
