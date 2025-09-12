@@ -1,0 +1,35 @@
+/* CSS Variables - Migrated from original portfolio */
+:root {
+  /* Typography */
+  --font-family: 'Poppins', 'SF Pro Text', system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
+  
+  /* Colors */
+  --text-color: #000000;
+  --text-secondary: #888888;
+  --text-primary: #1a1a1a;
+  --secondary-color: #666666;
+  --background: #ffffff;
+  
+  /* Layout */
+  --max-width: 800px;
+  --spacing: 2rem;
+  --spacing-sm: 1rem;
+  --spacing-lg: 3rem;
+  --spacing-xl: 4rem;
+  
+  /* Navigation */
+  --nav-height: 80px;
+  --nav-height-mobile: 70px;
+  --nav-background: rgba(255, 255, 255, 0.95);
+  
+  /* Animation */
+  --animation-duration: 0.8s;
+  --animation-easing: ease-out;
+  --animation-bezier: cubic-bezier(0.4, 0.0, 0.2, 1);
+  
+  /* Responsive breakpoints */
+  --breakpoint-mobile: 480px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+}
