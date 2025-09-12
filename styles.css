@@ -116,6 +116,8 @@ body {
   margin: 0;
   color: var(--text-secondary);
   width: 100%;
+  user-select: none;
+  cursor: default;
 }
 
 /* Emphasized text styles */
