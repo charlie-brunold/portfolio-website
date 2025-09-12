@@ -43,9 +43,10 @@ function animateTitle() {
         const wordSpan = document.createElement('span');
         wordSpan.className = 'word';
         
-        // Special handling for "Charlie," - just regular text now
+        // Special handling for "Charlie," - add emphasis class
         if (word === "Charlie,") {
             wordSpan.textContent = word;
+            wordSpan.classList.add('charlie');
         }
         // Special handling for skill rolodex placeholder
         else if (word === "<skill-rolodex></skill-rolodex>") {
