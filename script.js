@@ -79,7 +79,7 @@ function setupSkillRolodex() {
     
     
     // Skills array - easily expandable
-    const skills = ['Python', 'SQL', 'JavaScript', 'R', 'Tableau', 'Power BI'];
+    const skills = ['Python', 'SQL', 'C++', 'R', 'Tableau', 'ML', 'data analytics', 'statistics', 'C#', 'Pandas', 'NumPy', 'JMP'];
     let currentIndex = 0;
     
     // Create hidden measurement element that inherits title styling
@@ -159,7 +159,7 @@ function setupSkillRolodex() {
     
     function startAnimation() {
         if (animationInterval) clearInterval(animationInterval);
-        animationInterval = setInterval(animateNextSkill, 2800);
+        animationInterval = setInterval(animateNextSkill, 2000);
     }
     
     function stopAnimation() {
