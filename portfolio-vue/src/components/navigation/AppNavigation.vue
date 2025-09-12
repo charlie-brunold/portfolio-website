@@ -32,11 +32,11 @@ onUnmounted(() => {
 
 <template>
   <nav ref="nav" class="navigation">
-    <div class="nav-brand">Charlie Brunold</div>
+    <router-link to="/" class="nav-brand">Charlie Brunold</router-link>
     <div class="nav-links">
-      <a href="404.html" class="nav-link">Work</a>
-      <a href="404.html" class="nav-link">About</a>
-      <a href="404.html" class="nav-link">Contact</a>
+      <router-link to="/work" class="nav-link">Work</router-link>
+      <router-link to="/about" class="nav-link">About</router-link>
+      <router-link to="/contact" class="nav-link">Contact</router-link>
     </div>
   </nav>
 </template>
@@ -64,6 +64,12 @@ onUnmounted(() => {
   font-size: 18px;
   color: var(--text-color);
   font-family: var(--font-mono);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav-brand:hover {
+  color: var(--secondary-color);
 }
 
 .nav-links {
