@@ -1,7 +1,7 @@
 // Word-by-word animation on page load
 function animateTitle() {
     const titleElement = document.getElementById('animated-title');
-    const originalText = "Hey, I'm Charlie, an AI for Business student using <skill-rolodex></skill-rolodex> to solve complex business problems.";
+    const originalText = "Hey, I'm Charlie, an AI for Business student using <skill-rolodex></skill-rolodex> to solve <br> complex business challenges.";
     const words = originalText.split(' ');
     
     // Nonlinear timing pattern for more visual interest
@@ -19,14 +19,27 @@ function animateTitle() {
         1.9,    // "<skill-rolodex></skill-rolodex>" - quick
         2.4,    // "to" - longer pause
         2.5,    // "solve" - quick
-        2.7,    // "complex" - quick
-        2.9,    // "business" - quick
-        3.2     // "problems." - medium
+        2.6,    // "<br>" - immediate (no visual delay)
+        2.8,    // "complex" - quick
+        3.0,    // "business" - quick
+        3.3     // "challenges." - medium
     ];
     
     // Clear the original text and wrap each word in a span
     titleElement.innerHTML = '';
     words.forEach((word, index) => {
+        // Special handling for line break - don't wrap in span
+        if (word === "<br>") {
+            const brElement = document.createElement('br');
+            brElement.className = 'line-break';
+            const delay = timingPattern[index] || (index * 0.15);
+            brElement.style.animationDelay = `${delay}s`;
+            brElement.style.animation = `fadeInWord 0.8s ease-out forwards`;
+            brElement.style.opacity = '0';
+            titleElement.appendChild(brElement);
+            return;
+        }
+        
         const wordSpan = document.createElement('span');
         wordSpan.className = 'word';
         
@@ -211,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const nav = document.querySelector('.navigation');
     
     window.addEventListener('scroll', function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
         
         if (scrollTop > lastScrollTop && scrollTop > 100) {
             // Scrolling down

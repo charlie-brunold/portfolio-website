@@ -129,6 +129,12 @@ body {
   margin-right: 0;
 }
 
+/* Special handling for line break elements */
+.line-break {
+  opacity: 0;
+  animation: fadeInWord 0.8s ease-out forwards;
+}
+
 @keyframes fadeInWord {
   to {
     opacity: 1;
