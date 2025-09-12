@@ -179,8 +179,32 @@ function setupSkillRolodex() {
         }, 100); // Small delay to let width animation lead
     }
     
-    // Start the continuous animation
-    setInterval(animateNextSkill, 2800); // Change skill every 2.8 seconds
+    // Start the continuous animation with visibility handling
+    let animationInterval;
+    
+    function startAnimation() {
+        if (animationInterval) clearInterval(animationInterval);
+        animationInterval = setInterval(animateNextSkill, 2800);
+    }
+    
+    function stopAnimation() {
+        if (animationInterval) {
+            clearInterval(animationInterval);
+            animationInterval = null;
+        }
+    }
+    
+    // Handle tab visibility changes
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            stopAnimation();
+        } else {
+            startAnimation();
+        }
+    });
+    
+    // Start the animation initially
+    startAnimation();
     
     // Cleanup: Remove measurement element (optional, but clean)
     // Could be removed immediately since we have all measurements
