@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 
 const scrambleText = ref<HTMLElement>()
+const constructionWorker = ref<HTMLElement>()
 
 class ScrambleText {
   element: HTMLElement
@@ -111,24 +112,8 @@ class ScrambleText {
   }
 }
 
-onMounted(() => {
-  if (scrambleText.value) {
-    new ScrambleText(scrambleText.value, { duration: 3000 })
-  }
-})
-</script>
-
-<template>
-  <main class="main-content">
-    <div class="center-content">
-      <h1 
-        ref="scrambleText" 
-        class="main-title"
-      >
-        Coming Soon
-      </h1>
-      
-      <pre class="construction-ascii">                                                                                          
+// ASCII Art Frames
+const frame1 = `                                                                                          
                                                                                           
                                            [[[                                            
                                          [[}[[[[                                          
@@ -145,7 +130,7 @@ onMounted(() => {
                              [[}[[[}[[             [[}[[[}[[                              
                             [[}[[}[[[               [[[}[[}[[                             
                            [}[[[}[[}                 [}[[[[}[[                            
-                          [[[}[[[[}                   [[}[[[}[[                           
+                          [[[}[[[[}            @@@@   [[}[[[}[[                           
                          [}[[[}[[}            @@@@@@   [[}[[[}[[                          
                         [[[}[[[}[             @@@@@@    ][}[[[}[[-                        
                        [}[[[}[[[   ]@@@@@@@@@) @@@@=     <[}[[[}[[=                       
@@ -171,7 +156,112 @@ onMounted(() => {
    [[[[}[[}[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}[[[}[}[[}[    
      ][[[}[[}[[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[[}[[[[[}[      
                                                                                           
-                                                                                          </pre>
+                                                                                          `
+
+const frame2 = `                                                                                          
+                                            
+                                          [[[                                            
+                                        [[}[[[[                                          
+                                        [[}[[}[[[                                         
+                                      [}[[[}[[}[[:                                       
+                                      [[[}[[[[}[[}[-                                      
+                                    :[}[[[}[[}[[}[[}=                                     
+                                  =[[}[[[}[[[}[[}[[*                                    
+                                  -[}[[[}[[< -[[[}[[[[<                                   
+                                *[[[}[[[}*    [}[[}[[}]                                  
+                                <[[}[[}[[=      [[}[[}[[]                                 
+                              ][[}[[[[}         [[[}[[[[[                                
+                              ][[}[[}[[           [}[[}[}[[                               
+                            [[}[[[}[[             [[}[[[}[[                              
+                            [[}[[}[[[               [[[}[[}[[                             
+                          [}[[[}[[}                 [}[[[[}[[                            
+                          [[[}[[[[}            @@@@   [[}[[[}[[                           
+                        [}[[[}[[}             @@@@@=  [[}[[[}[[                          
+                        [[[}[[[}[             @@@@@=    ][}[[[}[[-                        
+                      [}[[[}[[[   ]@@@@@@@@@)  @@@=     <[}[[[}[[=                       
+                    -[[[}[[[}[   @@@@@@@@@@@@            >[[}[[}[[=                      
+                    =[[}[[}[[<   %@@   @@@@@@@             *[[}[[}[[*                     
+                  =[[}[[[[}>   @@@   @@@@@@@@              -[[}[[}[[)                    
+                  *[}[[[}[[+    @@ @@@@@@@@@@@                [[}[[}[[[                   
+                )[[[}[[[}-         @@@@@@@@@@                 [[}[[}[[[                  
+                [[[}[[}[[           =@@@@@ @@@                  [[}[[}[[[                 
+              [[[}[[[[}          @@@@  <>@@@%                   [[}[[}[[[                
+              [[}[[[}[[          #@@@@@@[   @@@                   [[}[[}[[[               
+            [}[[}[[[}          #@@@  @@@@      }@@@     @@@@      [[}[[}[[[              
+            [[[}[[}[[          %@@@    @@@@       @@@   @@@@@@>     [[}[[}[[[             
+          [}[[[}[[}          ]@@@      }@@          @[@@@@@@@@@     [[}[[}[[[            
+          [[[}[[[}[          [@@@       :@@         %@@@@@@@@@@@@:    [[}[[}[[[           
+        [}[[[}[[[          [@@@         @@+      @@@@@@@@@@@@@@@@#    ][[[[}[[[-         
+        [[[}[[[}[          =@@@          @@<    :@@@@@@@@@@@@@@@@@@@    >}[[[}[[}=        
+      -[}[[[}[[]            @@           @@}   %@@@@@@@@@@@@@@@@@@@@@>   *[}[[}[[[+       
+    +[[[}[[[}>                           >)  @@@@@@@@@@@@@@@@@@@@@@@@}   +[[[[}[}[>      
+    +[[}[[}[[[+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[}[[[[[[[)     
+  >[[}[[[[}[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}[[}[}[[[    
+  [[}[[}[[[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[[[}[[[[}[[:   
+  [[[[}[[}[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}[[[}[}[[}[    
+    ][[[}[[}[[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[}[[}[[[[[}[      
+                                                                                            
+                                                                                            `
+
+class ConstructionWorkerAnimation {
+  element: HTMLElement
+  currentFrame: number
+  isRunning: boolean
+
+  constructor(element: HTMLElement) {
+    this.element = element
+    this.currentFrame = 0
+    this.isRunning = false
+  }
+
+  start() {
+    if (this.isRunning) return
+    this.isRunning = true
+    this.animate()
+  }
+
+  animate() {
+    if (!this.isRunning) return
+    
+    const frames = [frame1, frame2]
+    this.element.textContent = frames[this.currentFrame]
+    this.currentFrame = (this.currentFrame + 1) % frames.length
+    
+    setTimeout(() => this.animate(), 1000) // 1 second per frame
+  }
+
+  stop() {
+    this.isRunning = false
+  }
+}
+
+onMounted(() => {
+  if (scrambleText.value) {
+    new ScrambleText(scrambleText.value, { duration: 3000 })
+  }
+  
+  if (constructionWorker.value) {
+    const workerAnimation = new ConstructionWorkerAnimation(constructionWorker.value)
+    // Start animation immediately
+    workerAnimation.start()
+  }
+})
+</script>
+
+<template>
+  <main class="main-content">
+    <div class="center-content">
+      <h1 
+        ref="scrambleText" 
+        class="main-title"
+      >
+        Coming Soon
+      </h1>
+      
+      <pre 
+        ref="constructionWorker"
+        class="construction-ascii"
+      ></pre>
     </div>
   </main>
 </template>
@@ -201,7 +291,7 @@ onMounted(() => {
   font-family: 'Courier New', monospace;
   white-space: pre;
   line-height: 1;
-  font-size: 0.5rem;
+  font-size: 0.3rem;
   color: var(--text-color);
   opacity: 0.7;
   margin-top: 1rem;
@@ -216,7 +306,7 @@ onMounted(() => {
   }
   
   .construction-ascii {
-    font-size: 0.4rem;
+    font-size: 0.25rem;
   }
 }
 
@@ -226,7 +316,7 @@ onMounted(() => {
   }
   
   .construction-ascii {
-    font-size: 0.3rem;
+    font-size: 0.2rem;
   }
 }
 </style>
