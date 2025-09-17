@@ -1,60 +1,85 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
+import { useResponsiveAnimation } from '@/composables/useResponsiveAnimation'
 
 // Skills array - easily expandable
 const skills = ['Python', 'SQL', 'C++', 'R', 'Tableau', 'ML', 'data analytics', 'statistics', 'C#', 'Pandas', 'NumPy', 'JMP']
 const currentIndex = ref(0)
 const rolodexElement = ref<HTMLElement>()
-const measureElement = ref<HTMLElement>()
 const skillDisplay = ref<HTMLElement>()
 
 // Animation state
 let animationInterval: number | null = null
-const isVisible = ref(true)
-
-// Skill widths cache
 const skillWidths = ref<number[]>([])
-const currentWidth = ref(0)
+
+// Use responsive animation composable
+const {
+  shouldAnimate,
+  measureText,
+  observeElement,
+  clearMeasurementCache,
+  debounce
+} = useResponsiveAnimation({
+  debounceDelay: 100,
+  respectReducedMotion: true,
+  pauseOnHidden: true
+})
 
 // Current skill computed property
 const currentSkill = computed(() => skills[currentIndex.value])
 
-// Pre-calculate widths for all skills
+// Current width as CSS custom property
+const currentWidth = computed(() => {
+  const width = skillWidths.value[currentIndex.value]
+  return width ? `${width}px` : 'auto'
+})
+
+// Calculate skill widths using robust measuring system
 const calculateSkillWidths = async () => {
-  await nextTick() // Wait for DOM to be ready
-  
-  if (!measureElement.value || !rolodexElement.value) return
-  
-  const computedStyle = window.getComputedStyle(rolodexElement.value)
-  const fontSize = parseFloat(computedStyle.fontSize)
-  const paddingEm = 0.5 // Total horizontal padding (0.25em * 2)
-  const paddingPx = paddingEm * fontSize
-  
-  // Calculate widths for each skill - exact legacy calculation
-  skillWidths.value = skills.map(skill => {
-    if (measureElement.value) {
-      measureElement.value.textContent = skill
-      const textWidth = measureElement.value.getBoundingClientRect().width
-      return textWidth + paddingPx // No buffer, exact legacy calculation
+  await nextTick()
+
+  if (!rolodexElement.value) return
+
+  try {
+    const computedStyle = window.getComputedStyle(rolodexElement.value)
+    const fontSize = parseFloat(computedStyle.fontSize)
+    const paddingEm = 0.5 // Total horizontal padding (0.25em * 2)
+    const paddingPx = paddingEm * fontSize
+
+    // Use robust measuring system with fallbacks
+    skillWidths.value = skills.map(skill => {
+      const measurement = measureText(skill, rolodexElement.value!)
+      return Math.ceil(measurement.width + paddingPx)
+    })
+
+    // Update CSS custom property for immediate effect
+    if (rolodexElement.value) {
+      rolodexElement.value.style.setProperty('--skill-width', currentWidth.value)
     }
-    return 0
-  })
-  
-  // Set initial width
-  currentWidth.value = skillWidths.value[0] || 0
+  } catch (error) {
+    console.warn('Skill width calculation failed, using fallback:', error)
+    // Fallback to character-based calculation
+    const avgCharWidth = 12 // Reasonable fallback
+    skillWidths.value = skills.map(skill => (skill.length * avgCharWidth) + 20)
+  }
 }
 
 // Function to animate to next skill
 const animateNextSkill = () => {
+  if (!shouldAnimate.value) return
+
   currentIndex.value = (currentIndex.value + 1) % skills.length
-  const nextWidth = skillWidths.value[currentIndex.value]
-  
-  // Start width animation slightly before text animation for smooth feel
-  currentWidth.value = nextWidth
+
+  // Update CSS custom property for width transition
+  if (rolodexElement.value) {
+    rolodexElement.value.style.setProperty('--skill-width', currentWidth.value)
+  }
 }
 
-// Animation management
+// Animation management with respect for user preferences
 const startAnimation = () => {
+  if (!shouldAnimate.value) return
+
   if (animationInterval) clearInterval(animationInterval)
   animationInterval = setInterval(animateNextSkill, 2000)
 }
@@ -66,41 +91,57 @@ const stopAnimation = () => {
   }
 }
 
-// Handle tab visibility changes
-const handleVisibilityChange = () => {
-  isVisible.value = !document.hidden
-  if (isVisible.value) {
+// Watch shouldAnimate to start/stop based on visibility and motion preference
+watch(shouldAnimate, (animate) => {
+  if (animate) {
     startAnimation()
   } else {
     stopAnimation()
   }
+})
+
+// Setup resize observer and font loading handlers
+let cleanupObserver: (() => void) | null = null
+
+const handleResize = () => {
+  debounce(() => {
+    clearMeasurementCache()
+    calculateSkillWidths()
+  })
 }
 
 onMounted(async () => {
   await calculateSkillWidths()
-  startAnimation()
-  document.addEventListener('visibilitychange', handleVisibilityChange)
+
+  if (rolodexElement.value) {
+    // Setup resize observer for automatic recalculation
+    cleanupObserver = observeElement(rolodexElement.value, handleResize)
+  }
+
+  // Start animation if should animate
+  if (shouldAnimate.value) {
+    startAnimation()
+  }
 })
 
 onUnmounted(() => {
   stopAnimation()
-  document.removeEventListener('visibilitychange', handleVisibilityChange)
+  if (cleanupObserver) {
+    cleanupObserver()
+  }
 })
 </script>
 
 <template>
-  <span 
-    ref="rolodexElement" 
-    class="skill-rolodex" 
-    :style="{ width: `${currentWidth}px` }"
+  <span
+    ref="rolodexElement"
+    class="skill-rolodex"
+    :style="{ '--skill-width': currentWidth }"
   >
-    <!-- Hidden measurement element -->
-    <span ref="measureElement" class="skill-measure" aria-hidden="true"></span>
-    
     <!-- Skill display with Vue transition -->
-    <Transition name="skill-transition">
-      <span 
-        :key="currentSkill" 
+    <Transition name="skill-transition" appear>
+      <span
+        :key="currentSkill"
         ref="skillDisplay"
         class="skill-display"
       >
@@ -112,58 +153,45 @@ onUnmounted(() => {
 
 <style scoped>
 .skill-rolodex {
+  --skill-width: auto;
+  --padding-horizontal: 0.25em;
+
   position: relative;
   display: inline-block;
   white-space: nowrap;
   height: 1em;
   overflow: hidden;
   vertical-align: baseline;
-  transition: width 0.5s var(--animation-bezier);
-  padding: 0 0.25em; /* Slightly more padding for safety */
+  width: var(--skill-width);
+  transition: width 0.5s var(--animation-bezier, cubic-bezier(0.4, 0, 0.2, 1));
+  padding: 0 var(--padding-horizontal);
   transform: translateY(0.15em);
+  will-change: width;
 }
 
 .skill-display {
   position: absolute;
   top: 50%;
-  left: 0.25em;
-  width: calc(100% - 0.5em);
+  left: var(--padding-horizontal);
+  width: calc(100% - calc(var(--padding-horizontal) * 2));
   display: inline-block;
   line-height: inherit;
   transform: translateY(-50%);
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-primary, #1a1a1a);
   white-space: nowrap;
   overflow: visible;
+  will-change: transform;
 }
 
-/* Hidden element for measuring text width - must match .skill-display exactly */
-.skill-measure {
-  position: absolute;
-  visibility: hidden;
-  height: auto;
-  width: auto;
-  white-space: nowrap;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: 600;
-  line-height: inherit;
-  color: var(--text-primary);
-  top: -9999px;
-  left: -9999px;
-  /* Ensure exact matching of display element styles */
-  display: inline-block;
-  transform: translateY(-50%);
-}
-
-/* Vue Transitions */
+/* Vue Transitions with enhanced performance */
 .skill-transition-enter-active {
-  transition: transform 0.5s var(--animation-bezier);
+  transition: transform 0.5s var(--animation-bezier, cubic-bezier(0.4, 0, 0.2, 1));
   transition-delay: 0.1s;
 }
 
 .skill-transition-leave-active {
-  transition: transform 0.4s var(--animation-bezier);
+  transition: transform 0.4s var(--animation-bezier, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 .skill-transition-enter-from {
@@ -174,15 +202,50 @@ onUnmounted(() => {
   transform: translateY(-50%) translateY(-100%);
 }
 
-/* Responsive Design */
+/* Container queries for true responsive behavior */
+@container (max-width: 768px) {
+  .skill-rolodex {
+    --padding-horizontal: 0.2em;
+  }
+}
+
+@container (max-width: 480px) {
+  .skill-rolodex {
+    --padding-horizontal: 0.15em;
+  }
+}
+
+/* Fallback media queries for unsupported browsers */
 @media (max-width: 768px) {
   .skill-rolodex {
-    padding: 0 0.2em;
+    --padding-horizontal: 0.2em;
   }
-  
+}
+
+@media (max-width: 480px) {
+  .skill-rolodex {
+    --padding-horizontal: 0.15em;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .skill-rolodex,
+  .skill-transition-enter-active,
+  .skill-transition-leave-active {
+    transition: none;
+  }
+
+  .skill-transition-enter-from,
+  .skill-transition-leave-to {
+    transform: translateY(-50%);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
   .skill-display {
-    left: 0.2em;
-    width: calc(100% - 0.4em);
+    font-weight: 700;
   }
 }
 </style>

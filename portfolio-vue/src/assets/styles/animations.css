@@ -1,90 +1,117 @@
-/* Animation Styles - Migrated from original portfolio */
+/* Enhanced Animation Styles - Responsive & Performance Optimized */
 
-/* Word Animation Styles */
+/* CSS Custom Properties for Animation System */
+:root {
+  --animation-duration: 0.6s;
+  --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-bezier: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Responsive animation durations */
+  --animation-duration-fast: 0.3s;
+  --animation-duration-slow: 0.8s;
+
+  /* Skill rolodex specific */
+  --skill-width: auto;
+  --skill-padding: 0.25em;
+
+  /* Typography fluid scaling */
+  --fluid-font-min: 1rem;
+  --fluid-font-max: 4.5rem;
+  --fluid-font-scale: 4vw;
+}
+
+/* Enhanced Word Animation Styles */
 .word {
-  display: inline-block;
+  display: inline-flex;
+  align-items: baseline;
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(0.5em);
+  will-change: opacity, transform;
   animation: fadeInWord var(--animation-duration) var(--animation-easing) forwards;
-  margin-right: 0.3em;
+
+  /* Performance optimizations */
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
-.word:last-child {
-  margin-right: 0;
-}
-
-/* Special handling for line break elements */
-.line-break {
-  opacity: 0;
-  animation: fadeInWord var(--animation-duration) var(--animation-easing) forwards;
-}
-
+/* Optimized fade-in animation */
 @keyframes fadeInWord {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em);
+  }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* Skill Rolodex Animation */
+/* Enhanced Skill Rolodex Styles */
 .skill-rolodex {
+  --skill-width: auto;
+  --padding-horizontal: var(--skill-padding);
+
   position: relative;
   display: inline-block;
   white-space: nowrap;
   height: 1em;
   overflow: hidden;
   vertical-align: baseline;
+  width: var(--skill-width);
   transition: width 0.5s var(--animation-bezier);
-  padding: 0 0.2em;
+  padding: 0 var(--padding-horizontal);
   transform: translateY(0.15em);
+  will-change: width;
+
+  /* Performance optimizations */
+  contain: layout style;
+  transform: translateZ(0);
 }
 
 .skill-display {
   position: absolute;
   top: 50%;
-  left: 0.2em;
-  width: calc(100% - 0.4em);
+  left: var(--padding-horizontal);
+  width: calc(100% - calc(var(--padding-horizontal) * 2));
   display: inline-block;
-  transition: transform 0.6s var(--animation-bezier);
-  will-change: transform;
   line-height: inherit;
   transform: translateY(-50%);
   font-weight: 600;
-  color: var(--text-primary);
-}
-
-.skill-entering {
-  transform: translateY(50%);
-}
-
-.skill-active {
-  transform: translateY(-50%);
-}
-
-.skill-exiting {
-  transform: translateY(-150%);
-}
-
-/* Hidden element for measuring text width */
-.skill-measure {
-  position: absolute;
-  visibility: hidden;
-  height: auto;
-  width: auto;
+  color: var(--text-primary, #1a1a1a);
   white-space: nowrap;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
-  top: -9999px;
-  left: -9999px;
+  overflow: visible;
+  will-change: transform;
+
+  /* Performance optimizations */
+  backface-visibility: hidden;
+  transform: translateZ(0) translateY(-50%);
 }
 
-/* Footer Letter Animation */
+/* Vue Transitions for Skill Rolodex */
+.skill-transition-enter-active {
+  transition: transform 0.5s var(--animation-bezier);
+  transition-delay: 0.1s;
+}
+
+.skill-transition-leave-active {
+  transition: transform 0.4s var(--animation-bezier);
+}
+
+.skill-transition-enter-from {
+  transform: translateY(-50%) translateY(100%);
+}
+
+.skill-transition-leave-to {
+  transform: translateY(-50%) translateY(-100%);
+}
+
+/* Footer Letter Animation - Enhanced */
 .footer-letter {
   display: inline-block;
   transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   transform-origin: bottom center;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .footer-letter.space {
@@ -100,52 +127,125 @@
 }
 
 @keyframes footerBob {
-  0% { transform: translateY(0px); }
-  40% { transform: translateY(-6px); }
-  70% { transform: translateY(-3px); }
-  100% { transform: translateY(0px); }
+  0% { transform: translateY(0) translateZ(0); }
+  40% { transform: translateY(-6px) translateZ(0); }
+  70% { transform: translateY(-3px) translateZ(0); }
+  100% { transform: translateY(0) translateZ(0); }
 }
 
 @keyframes footerSettle {
-  0% { transform: translateY(0px); }
-  20% { transform: translateY(-4px); }
-  40% { transform: translateY(-1px); }
-  60% { transform: translateY(-2px); }
-  80% { transform: translateY(-0.5px); }
-  100% { transform: translateY(0px); }
+  0% { transform: translateY(0) translateZ(0); }
+  20% { transform: translateY(-4px) translateZ(0); }
+  40% { transform: translateY(-1px) translateZ(0); }
+  60% { transform: translateY(-2px) translateZ(0); }
+  80% { transform: translateY(-0.5px) translateZ(0); }
+  100% { transform: translateY(0) translateZ(0); }
 }
 
-/* Vue Transitions */
-.skill-transition-enter-active, .skill-transition-leave-active {
-  transition: transform 0.6s var(--animation-bezier);
+/* Container Queries for True Responsive Behavior */
+@container (max-width: 768px) {
+  :root {
+    --skill-padding: 0.2em;
+    --animation-duration: 0.5s;
+  }
 }
 
-.skill-transition-enter-from {
-  transform: translateY(50%);
+@container (max-width: 480px) {
+  :root {
+    --skill-padding: 0.15em;
+    --animation-duration: 0.4s;
+  }
 }
 
-.skill-transition-leave-to {
-  transform: translateY(-150%);
-}
-
-/* Responsive Animations */
+/* Media Query Fallbacks */
 @media (max-width: 768px) {
+  :root {
+    --skill-padding: 0.2em;
+    --animation-duration: 0.5s;
+  }
+
   .word {
-    margin-right: 0.25em;
-  }
-  
-  .skill-rolodex {
-    padding: 0 0.15em;
-  }
-  
-  .skill-display {
-    left: 0.15em;
-    width: calc(100% - 0.3em);
+    animation-duration: var(--animation-duration-fast);
   }
 }
 
 @media (max-width: 480px) {
-  .word {
-    margin-right: 0.2em;
+  :root {
+    --skill-padding: 0.15em;
+    --animation-duration: 0.4s;
   }
+}
+
+/* Accessibility & Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --animation-duration: 0.1s;
+    --animation-duration-fast: 0.05s;
+    --animation-duration-slow: 0.15s;
+  }
+
+  .word,
+  .skill-rolodex,
+  .skill-transition-enter-active,
+  .skill-transition-leave-active,
+  .footer-letter {
+    transition: none;
+    animation: none;
+  }
+
+  .word {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .skill-transition-enter-from,
+  .skill-transition-leave-to {
+    transform: translateY(-50%);
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .skill-display {
+    font-weight: 700;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .word,
+  .skill-rolodex,
+  .footer-letter {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Performance Optimization for High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .skill-display,
+  .word {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .skill-display {
+    color: var(--text-primary-dark, #ffffff);
+  }
+
+  .word {
+    color: var(--text-secondary-dark, #cccccc);
+  }
+}
+
+/* Focus Management for Accessibility */
+.word:focus-visible,
+.skill-rolodex:focus-visible {
+  outline: 2px solid var(--focus-color, #0066cc);
+  outline-offset: 2px;
 }
