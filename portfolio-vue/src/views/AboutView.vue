@@ -2,23 +2,50 @@
   <div class="about">
     <div class="about-content">
       <div class="about-text">
-        <h1 class="intro">Hey, I'm <span class="name-highlight">Charlie Brunold</span>.</h1>
+        <TypewriterText
+          :text="introText"
+          class="intro"
+          :start-delay="300"
+          :animation-duration="1200"
+        />
 
         <div class="section">
-          <h2>I'm passionate about:</h2>
-          <ul>
-            <li>Building with code and seeing projects come to life</li>
-            <li>The intersection of design and data</li>
-            <li>Finding patterns through statistics</li>
+          <TypewriterText
+            :text="passionTitle"
+            tag="h2"
+            :start-delay="800"
+            :animation-duration="1000"
+          />
+          <ul class="typewriter-list">
+            <TypewriterText
+              v-for="(item, index) in passionItems"
+              :key="`passion-${index}`"
+              :text="item"
+              tag="li"
+              :start-delay="1200 + (index * 400)"
+              :animation-duration="1400"
+              class="list-item"
+            />
           </ul>
         </div>
 
         <div class="section">
-          <h2>I aspire to:</h2>
-          <ul>
-            <li>Serve as a translator between technical and non-technical audiences</li>
-            <li>Learn about human behavior and world systems using data</li>
-            <li>Bring joy to teams</li>
+          <TypewriterText
+            :text="aspirationTitle"
+            tag="h2"
+            :start-delay="3000"
+            :animation-duration="1000"
+          />
+          <ul class="typewriter-list">
+            <TypewriterText
+              v-for="(item, index) in aspirationItems"
+              :key="`aspiration-${index}`"
+              :text="item"
+              tag="li"
+              :start-delay="3400 + (index * 500)"
+              :animation-duration="1600"
+              class="list-item"
+            />
           </ul>
         </div>
       </div>
@@ -32,6 +59,23 @@
 
 <script setup lang="ts">
 import AsciiPortrait from '@/components/AsciiPortrait.vue'
+import TypewriterText from '@/components/animations/TypewriterText.vue'
+
+// Content for typewriter animation
+const introText = "Hey, I'm Charlie Brunold."
+const passionTitle = "I'm passionate about:"
+const passionItems = [
+  "Building with code and seeing projects come to life",
+  "The intersection of design and data",
+  "Finding patterns through statistics"
+]
+
+const aspirationTitle = "I aspire to:"
+const aspirationItems = [
+  "Serve as a translator between technical and non-technical audiences",
+  "Learn more about human behavior and world systems using data",
+  "Bring joy to teams"
+]
 </script>
 
 <style>
@@ -77,10 +121,45 @@ import AsciiPortrait from '@/components/AsciiPortrait.vue'
   color: var(--text-secondary);
   margin: 0 0 2.5rem 0;
   line-height: 1.2;
+  opacity: 0;
+  animation: introFadeIn 0.5s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+@keyframes introFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.3rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .section {
   margin-bottom: 2rem;
+  opacity: 0;
+  animation: sectionFadeIn 0.6s ease-out forwards;
+}
+
+.section:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.section:nth-child(3) {
+  animation-delay: 2.8s;
+}
+
+@keyframes sectionFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .section h2 {
@@ -91,11 +170,11 @@ import AsciiPortrait from '@/components/AsciiPortrait.vue'
   line-height: 1.3;
 }
 
-.section ul {
+.section ul,
+.section .typewriter-list {
   list-style: none;
   padding: 0;
   margin: 0;
-  padding-left: 2rem;
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
@@ -203,6 +282,42 @@ import AsciiPortrait from '@/components/AsciiPortrait.vue'
 
   .section li {
     font-size: 0.9rem;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .intro,
+  .section {
+    opacity: 1;
+    animation: none;
+    transform: none;
+  }
+
+  .intro {
+    animation: introFadeInReduced 0.3s ease-out forwards;
+  }
+
+  .section {
+    animation: sectionFadeInReduced 0.3s ease-out forwards;
+  }
+
+  .section:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  .section:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+
+  @keyframes introFadeInReduced {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes sectionFadeInReduced {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 }
 </style>

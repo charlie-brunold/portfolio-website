@@ -194,12 +194,14 @@ onMounted(async () => {
 <style scoped>
 .ascii-portrait-container {
   display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
   overflow: visible;
   padding: 0;
+  padding-left: 43%;
+  padding-top: 5%;
   box-sizing: border-box;
 }
 
@@ -232,7 +234,7 @@ onMounted(async () => {
   transform: scale(1);
 
   /* Ensure perfect character alignment */
-  letter-spacing: 0;
+  letter-spacing: -0.02em;
   word-spacing: 0;
   text-rendering: optimizeSpeed;
 
@@ -293,7 +295,7 @@ onMounted(async () => {
 /* Large desktop screens */
 @media (min-width: 1400px) {
   .ascii-portrait {
-    font-size: 0.27vw;
+    font-size: 0.23vw;
     max-height: none;
   }
 }
