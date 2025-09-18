@@ -7,8 +7,8 @@
         <div class="section">
           <h2>I'm passionate about:</h2>
           <ul>
-            <li>Building things through code and seeing them come to life</li>
-            <li>The intersection of design and data visualization</li>
+            <li>Building with code and seeing projects come to life</li>
+            <li>The intersection of design and data</li>
             <li>Finding patterns through statistics</li>
           </ul>
         </div>
@@ -17,7 +17,7 @@
           <h2>I aspire to:</h2>
           <ul>
             <li>Serve as a translator between technical and non-technical audiences</li>
-            <li>Discover the stories that data tells about human behavior and world systems</li>
+            <li>Learn about human behavior and world systems using data</li>
             <li>Bring joy to teams</li>
           </ul>
         </div>
