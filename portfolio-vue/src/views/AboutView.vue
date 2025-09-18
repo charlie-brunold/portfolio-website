@@ -46,12 +46,14 @@ import AsciiPortrait from '@/components/AsciiPortrait.vue'
 
 .about-content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 0.6fr;
   gap: 4rem;
   max-width: 1200px;
   width: 100%;
   align-items: center;
   height: 80vh;
+  position: relative;
+  overflow: hidden;
 }
 
 .about-text {
@@ -65,6 +67,8 @@ import AsciiPortrait from '@/components/AsciiPortrait.vue'
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  position: relative;
+  z-index: 2;
 }
 
 .intro {
@@ -120,10 +124,16 @@ import AsciiPortrait from '@/components/AsciiPortrait.vue'
 }
 
 .about-portrait {
+  position: fixed;
+  bottom: -10vh;
+  right: -8vw;
+  width: 120vw;
+  height: 140vh;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 1rem;
+  justify-content: flex-end;
+  align-items: flex-end;
+  z-index: 1;
+  pointer-events: none;
 }
 
 @media (min-width: 1024px) {
@@ -132,7 +142,7 @@ import AsciiPortrait from '@/components/AsciiPortrait.vue'
   }
 }
 
-/* Mobile layout - stack vertically */
+/* Mobile layout - keep striking effect but adjust */
 @media (max-width: 768px) {
   .about {
     min-height: calc(100vh - var(--nav-height-mobile));
@@ -145,6 +155,7 @@ import AsciiPortrait from '@/components/AsciiPortrait.vue'
     grid-template-columns: 1fr;
     gap: var(--spacing-lg);
     text-align: center;
+    overflow: hidden;
   }
 
   .intro {
@@ -157,7 +168,16 @@ import AsciiPortrait from '@/components/AsciiPortrait.vue'
   }
 
   .about-portrait {
-    order: -1;
+    position: fixed;
+    bottom: -15vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 120vh;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
   }
 }
 

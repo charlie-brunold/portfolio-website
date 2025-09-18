@@ -21,10 +21,11 @@ const easeOutCubic = (t: number): number => {
 const getFadeCharacter = (finalChar: string, progress: number): string => {
   if (progress >= 1) return finalChar
 
-  // Define fade sequence: solid → medium → light → very light → final
-  const fadeSequence = ['█', '▓', '▒', '░']
+  // Define fade sequence using characters from the actual ASCII art
+  // From most dense/visible to least visible, using characters that appear in the art
+  const fadeSequence = ['@', '%', '#', '*', '+', '=', '-', ':', '.']
 
-  // Calculate which fade step we're on (0-3, then final)
+  // Calculate which fade step we're on (0-8, then final)
   const fadeSteps = fadeSequence.length
   const stepProgress = progress * (fadeSteps + 1) // +1 to include final character
   const currentStep = Math.floor(stepProgress)
@@ -193,12 +194,12 @@ onMounted(async () => {
 <style scoped>
 .ascii-portrait-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-end;
+  align-items: flex-end;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  padding: 20px;
+  overflow: visible;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -209,16 +210,19 @@ onMounted(async () => {
   margin: 0;
   padding: 0;
   color: #1a1a1a;
-  text-align: center;
+  text-align: right;
   overflow: visible;
 
-  /* Base size for desktop */
-  font-size: 1.8px;
+  /* Base size for desktop - using viewport units to maintain fixed screen size */
+  font-size: 0.27vw;
+
+  /* Enhanced visibility with stroke weight */
+  font-weight: 700;
 
   /* Responsive scaling */
-  transform-origin: center center;
-  max-width: 100%;
-  max-height: 80vh;
+  transform-origin: bottom right;
+  max-width: none;
+  max-height: none;
 
   /* Performance optimizations */
   will-change: transform;
@@ -240,16 +244,17 @@ onMounted(async () => {
 /* Tablet and smaller desktop screens */
 @media (max-width: 1200px) {
   .ascii-portrait {
-    font-size: 1.5px;
-    max-height: 75vh;
+    font-size: 0.22vw;
+    max-height: none;
   }
 }
 
 /* Small tablets */
 @media (max-width: 768px) {
   .ascii-portrait {
-    font-size: 1.2px;
-    max-height: 70vh;
+    font-size: 0.35vw;
+    max-height: none;
+    text-align: center;
   }
 
   .ascii-portrait-container {
@@ -260,8 +265,9 @@ onMounted(async () => {
 /* Mobile phones */
 @media (max-width: 480px) {
   .ascii-portrait {
-    font-size: 0.8px;
-    max-height: 70vh;
+    font-size: 0.4vw;
+    max-height: none;
+    text-align: center;
   }
 
   .ascii-portrait-container {
@@ -273,8 +279,9 @@ onMounted(async () => {
 /* Very small mobile screens */
 @media (max-width: 360px) {
   .ascii-portrait {
-    font-size: 0.6px;
-    max-height: 65vh;
+    font-size: 0.45vw;
+    max-height: none;
+    text-align: center;
   }
 
   .ascii-portrait-container {
@@ -286,16 +293,16 @@ onMounted(async () => {
 /* Large desktop screens */
 @media (min-width: 1400px) {
   .ascii-portrait {
-    font-size: 2.2px;
-    max-height: 85vh;
+    font-size: 0.27vw;
+    max-height: none;
   }
 }
 
 /* Extra large screens */
 @media (min-width: 1800px) {
   .ascii-portrait {
-    font-size: 2.8px;
-    max-height: 90vh;
+    font-size: 0.27vw;
+    max-height: none;
   }
 }
 
