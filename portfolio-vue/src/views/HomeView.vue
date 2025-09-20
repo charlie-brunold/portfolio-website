@@ -16,15 +16,12 @@ import HeroSection from '../components/sections/HeroSection.vue'
   justify-content: flex-start;
   text-align: left;
   padding: 0 var(--spacing);
-  height: 100vh;
-  margin-top: calc(-1 * var(--nav-height));
-  padding-top: var(--nav-height);
+  min-height: calc(100vh - var(--nav-height) - 120px);
 }
 
 @media (max-width: 768px) {
   .main-content {
-    margin-top: calc(-1 * var(--nav-height-mobile));
-    padding-top: var(--nav-height-mobile);
+    min-height: calc(100vh - var(--nav-height-mobile) - 120px);
   }
 }
 </style>
