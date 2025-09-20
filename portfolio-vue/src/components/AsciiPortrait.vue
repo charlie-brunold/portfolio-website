@@ -17,24 +17,30 @@ const easeOutCubic = (t: number): number => {
   return 1 - Math.pow(1 - t, 3)
 }
 
-// Character fade sequence from solid to transparent to final
-const getFadeCharacter = (finalChar: string, progress: number): string => {
+// Character stepping sequence from lightest to final character
+const getSteppingCharacter = (finalChar: string, progress: number): string => {
   if (progress >= 1) return finalChar
 
-  // Define fade sequence using characters from the actual ASCII art
-  // From most dense/visible to least visible, using characters that appear in the art
-  const fadeSequence = ['@', '%', '#', '*', '+', '=', '-', ':', '.']
+  // Define character sequence from lightest to darkest
+  // Arranged by visual density: lightest -> darkest
+  const characterSequence = [' ', '.', '-', ':', ';', '=', '+', '*', '#', 'x', 'X', '&', '$', '@']
 
-  // Calculate which fade step we're on (0-8, then final)
-  const fadeSteps = fadeSequence.length
-  const stepProgress = progress * (fadeSteps + 1) // +1 to include final character
-  const currentStep = Math.floor(stepProgress)
-
-  if (currentStep >= fadeSteps) {
-    return finalChar
+  // Find where the final character appears in the sequence
+  let finalCharIndex = characterSequence.indexOf(finalChar)
+  if (finalCharIndex === -1) {
+    // If final character isn't in sequence, treat it as space (start of sequence)
+    finalCharIndex = 0
   }
 
-  return fadeSequence[currentStep]
+  // Start from the lightest character (index 0) and step toward the final character
+  const stepsNeeded = finalCharIndex // Steps needed to reach final character
+  const currentStepFloat = progress * stepsNeeded
+  const currentStep = Math.floor(currentStepFloat)
+
+  // Clamp to final character index (don't go past the target)
+  const stepIndex = Math.min(currentStep, finalCharIndex)
+
+  return characterSequence[stepIndex]
 }
 
 const startRevealAnimation = () => {
@@ -43,7 +49,7 @@ const startRevealAnimation = () => {
   isAnimating.value = true
   const finalContent = asciiContent.value
 
-  // Create initial content preserving exact structure - replace non-whitespace, non-newline chars with spaces
+  // Create initial content with all characters starting as spaces for fade-in effect
   const maskedContent = finalContent.replace(/[^\s\n]/g, ' ')
   displayedContent.value = maskedContent
 
@@ -106,7 +112,7 @@ const startRevealAnimation = () => {
           allCharactersComplete = false
         }
 
-        displayChars[indexToReveal] = getFadeCharacter(finalChar, charEasedProgress)
+        displayChars[indexToReveal] = getSteppingCharacter(finalChar, charEasedProgress)
       } else {
         // Character hasn't started yet
         allCharactersComplete = false
