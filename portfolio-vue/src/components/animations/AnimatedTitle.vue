@@ -3,13 +3,30 @@ import { ref, onMounted, computed, nextTick } from 'vue'
 import { useResponsiveAnimation } from '@/composables/useResponsiveAnimation'
 import SkillRolodex from './SkillRolodex.vue'
 
-// Text content with semantic structure
-const textSegments = [
-  { text: "Hey, I'm", type: 'greeting' },
-  { text: "Charlie,", type: 'name', emphasis: true },
-  { text: "an AI for Business student using", type: 'description' },
-  { text: '<skill-rolodex>', type: 'component' },
-  { text: "to solve complex business challenges.", type: 'purpose' }
+// Text content organized by lines to prevent wrapping
+const textLines = [
+  {
+    lineNumber: 1,
+    segments: [
+      { text: "Hey, I'm", type: 'greeting' },
+      { text: "Charlie", type: 'name', emphasis: true },
+      { text: ", an AI for Business", type: 'description' }
+    ]
+  },
+  {
+    lineNumber: 2,
+    segments: [
+      { text: "student using", type: 'description' },
+      { text: '<skill-rolodex>', type: 'component' },
+      { text: "to solve", type: 'purpose' }
+    ]
+  },
+  {
+    lineNumber: 3,
+    segments: [
+      { text: "complex business challenges.", type: 'purpose' }
+    ]
+  }
 ]
 
 const animationStarted = ref(false)
@@ -21,43 +38,60 @@ const { shouldAnimate, observeElement } = useResponsiveAnimation({
   pauseOnHidden: true
 })
 
-// Flatten text segments into words with metadata
+// Flatten text lines into words with line and metadata
 const words = computed(() => {
   const result: Array<{
     text: string
     segmentType: string
     wordIndex: number
     globalIndex: number
+    lineNumber: number
     emphasis?: boolean
     isComponent?: boolean
   }> = []
 
   let globalIndex = 0
 
-  textSegments.forEach(segment => {
-    if (segment.text === '<skill-rolodex>') {
-      result.push({
-        text: segment.text,
-        segmentType: segment.type,
-        wordIndex: 0,
-        globalIndex: globalIndex++,
-        isComponent: true
-      })
-    } else {
-      const segmentWords = segment.text.split(/\s+/).filter(word => word.length > 0)
-      segmentWords.forEach((word, wordIndex) => {
+  textLines.forEach(line => {
+    line.segments.forEach(segment => {
+      if (segment.text === '<skill-rolodex>') {
         result.push({
-          text: word,
+          text: segment.text,
           segmentType: segment.type,
-          wordIndex,
+          wordIndex: 0,
           globalIndex: globalIndex++,
-          emphasis: segment.emphasis
+          lineNumber: line.lineNumber,
+          isComponent: true
         })
-      })
-    }
+      } else {
+        const segmentWords = segment.text.split(/\s+/).filter(word => word.length > 0)
+        segmentWords.forEach((word, wordIndex) => {
+          result.push({
+            text: word,
+            segmentType: segment.type,
+            wordIndex,
+            globalIndex: globalIndex++,
+            lineNumber: line.lineNumber,
+            emphasis: segment.emphasis
+          })
+        })
+      }
+    })
   })
 
   return result
+})
+
+// Group words by line number for template rendering
+const wordsByLine = computed(() => {
+  const lines: Record<number, typeof words.value> = {}
+  words.value.forEach(word => {
+    if (!lines[word.lineNumber]) {
+      lines[word.lineNumber] = []
+    }
+    lines[word.lineNumber].push(word)
+  })
+  return lines
 })
 
 // Dynamic timing calculation based on content and screen size
@@ -130,31 +164,38 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <h1
+  <div
     ref="titleElement"
     class="main-title"
     :class="{ 'animation-started': animationStarted }"
   >
-    <template v-for="wordData in words" :key="`${wordData.segmentType}-${wordData.globalIndex}`">
-      <!-- Skill Rolodex Component -->
-      <span
-        v-if="wordData.isComponent"
-        :class="getWordClasses(wordData)"
-        :style="{ animationDelay: getAnimationDelay(wordData) }"
-      >
-        <SkillRolodex />
-      </span>
+    <div
+      v-for="lineNumber in Object.keys(wordsByLine).map(Number).sort()"
+      :key="`line-${lineNumber}`"
+      class="title-line"
+      :class="`line-${lineNumber}`"
+    >
+      <template v-for="wordData in wordsByLine[lineNumber]" :key="`${wordData.segmentType}-${wordData.globalIndex}`">
+        <!-- Skill Rolodex Component -->
+        <span
+          v-if="wordData.isComponent"
+          :class="getWordClasses(wordData)"
+          :style="{ animationDelay: getAnimationDelay(wordData) }"
+        >
+          <SkillRolodex />
+        </span>
 
-      <!-- Regular word -->
-      <span
-        v-else
-        :class="getWordClasses(wordData)"
-        :style="{ animationDelay: getAnimationDelay(wordData) }"
-      >
-        {{ wordData.text }}
-      </span>
-    </template>
-  </h1>
+        <!-- Regular word -->
+        <span
+          v-else
+          :class="getWordClasses(wordData)"
+          :style="{ animationDelay: getAnimationDelay(wordData) }"
+        >
+          {{ wordData.text }}
+        </span>
+      </template>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -165,9 +206,8 @@ onUnmounted(() => {
   --line-height: clamp(1.3, 1.2 + 0.2vw, 1.5);
 
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--word-spacing);
-  align-items: baseline;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: flex-start;
 
   font-size: var(--base-font-size);
@@ -179,11 +219,17 @@ onUnmounted(() => {
   max-width: 100%;
   user-select: none;
   cursor: default;
+}
 
-  /* Ensure natural text flow */
-  word-break: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
+/* Line containers to prevent wrapping */
+.title-line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--word-spacing);
+  white-space: nowrap;
+  width: 100%;
+  min-height: 1em;
+  overflow: visible;
 }
 
 /* Word Animation Styles with Performance Optimizations */
