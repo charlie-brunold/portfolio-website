@@ -2,50 +2,25 @@
   <div class="about">
     <div class="about-content">
       <div class="about-text">
-        <TypewriterText
-          :text="introText"
-          class="intro"
-          :start-delay="300"
-          :animation-duration="1200"
-        />
+        <div class="intro">
+          <span class="name-highlight">{{ introText }}</span>
+        </div>
 
-        <div class="section">
-          <TypewriterText
-            :text="passionTitle"
-            tag="h2"
-            :start-delay="800"
-            :animation-duration="1000"
-          />
-          <ul class="typewriter-list">
-            <TypewriterText
-              v-for="(item, index) in passionItems"
-              :key="`passion-${index}`"
-              :text="item"
-              tag="li"
-              :start-delay="1200 + (index * 400)"
-              :animation-duration="1400"
-              class="list-item"
-            />
+        <div class="section passion-section">
+          <h2>{{ passionTitle }}</h2>
+          <ul>
+            <li v-for="(item, index) in passionItems" :key="`passion-${index}`">
+              {{ item }}
+            </li>
           </ul>
         </div>
 
-        <div class="section">
-          <TypewriterText
-            :text="aspirationTitle"
-            tag="h2"
-            :start-delay="3000"
-            :animation-duration="1000"
-          />
-          <ul class="typewriter-list">
-            <TypewriterText
-              v-for="(item, index) in aspirationItems"
-              :key="`aspiration-${index}`"
-              :text="item"
-              tag="li"
-              :start-delay="3400 + (index * 500)"
-              :animation-duration="1600"
-              class="list-item"
-            />
+        <div class="section aspiration-section">
+          <h2>{{ aspirationTitle }}</h2>
+          <ul>
+            <li v-for="(item, index) in aspirationItems" :key="`aspiration-${index}`">
+              {{ item }}
+            </li>
           </ul>
         </div>
       </div>
@@ -59,9 +34,8 @@
 
 <script setup lang="ts">
 import AsciiPortrait from '@/components/AsciiPortrait.vue'
-import TypewriterText from '@/components/animations/TypewriterText.vue'
 
-// Content for typewriter animation
+// Content for sections
 const introText = "Hey, I'm Charlie Brunold."
 const passionTitle = "I'm passionate about:"
 const passionItems = [
@@ -122,39 +96,28 @@ const aspirationItems = [
   margin: 0 0 2.5rem 0;
   line-height: 1.2;
   opacity: 0;
-  animation: introFadeIn 0.5s ease-out forwards;
+  animation: fadeInFromBottom 0.8s ease-out forwards;
   animation-delay: 0.2s;
-}
-
-@keyframes introFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(0.3rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .section {
   margin-bottom: 2rem;
   opacity: 0;
-  animation: sectionFadeIn 0.6s ease-out forwards;
+  animation: fadeInFromBottom 0.8s ease-out forwards;
 }
 
-.section:nth-child(2) {
+.passion-section {
   animation-delay: 0.6s;
 }
 
-.section:nth-child(3) {
-  animation-delay: 2.8s;
+.aspiration-section {
+  animation-delay: 1.0s;
 }
 
-@keyframes sectionFadeIn {
+@keyframes fadeInFromBottom {
   from {
     opacity: 0;
-    transform: translateY(0.5rem);
+    transform: translateY(1.5rem);
   }
   to {
     opacity: 1;
@@ -170,8 +133,7 @@ const aspirationItems = [
   line-height: 1.3;
 }
 
-.section ul,
-.section .typewriter-list {
+.section ul {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -290,32 +252,23 @@ const aspirationItems = [
   .intro,
   .section {
     opacity: 1;
-    animation: none;
+    animation: fadeInReduced 0.3s ease-out forwards;
     transform: none;
   }
 
   .intro {
-    animation: introFadeInReduced 0.3s ease-out forwards;
-  }
-
-  .section {
-    animation: sectionFadeInReduced 0.3s ease-out forwards;
-  }
-
-  .section:nth-child(2) {
     animation-delay: 0.1s;
   }
 
-  .section:nth-child(3) {
+  .passion-section {
     animation-delay: 0.2s;
   }
 
-  @keyframes introFadeInReduced {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  .aspiration-section {
+    animation-delay: 0.3s;
   }
 
-  @keyframes sectionFadeInReduced {
+  @keyframes fadeInReduced {
     from { opacity: 0; }
     to { opacity: 1; }
   }
