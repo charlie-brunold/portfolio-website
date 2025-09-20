@@ -3,8 +3,8 @@ import { ref, onMounted, computed, nextTick } from 'vue'
 import { useResponsiveAnimation } from '@/composables/useResponsiveAnimation'
 import SkillRolodex from './SkillRolodex.vue'
 
-// Text content organized by lines to prevent wrapping
-const textLines = [
+// Desktop text layout (768px+)
+const desktopTextLines = [
   {
     lineNumber: 1,
     segments: [
@@ -29,6 +29,61 @@ const textLines = [
   }
 ]
 
+// Mobile text layout (< 768px)
+const mobileTextLines = [
+  {
+    lineNumber: 1,
+    segments: [
+      { text: "Hey, I'm", type: 'greeting' },
+      { text: "Charlie", type: 'name', emphasis: true },
+      { text: ",", type: 'punctuation' }
+    ]
+  },
+  {
+    lineNumber: 2,
+    segments: [
+      { text: "an AI for Business", type: 'description' }
+    ]
+  },
+  {
+    lineNumber: 3,
+    segments: [
+      { text: "student using", type: 'description' }
+    ]
+  },
+  {
+    lineNumber: 4,
+    segments: [
+      { text: '<skill-rolodex>', type: 'component' }
+    ]
+  },
+  {
+    lineNumber: 5,
+    segments: [
+      { text: "to solve complex", type: 'purpose' }
+    ]
+  },
+  {
+    lineNumber: 6,
+    segments: [
+      { text: "business challenges.", type: 'purpose' }
+    ]
+  }
+]
+
+// Reactive screen size detection
+const isMobile = ref(false)
+
+// Function to check if screen is mobile
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth < 768
+}
+
+// Current text lines based on screen size
+const textLines = computed(() => {
+  return isMobile.value ? mobileTextLines : desktopTextLines
+})
+
 const animationStarted = ref(false)
 const titleElement = ref<HTMLElement>()
 
@@ -52,7 +107,7 @@ const words = computed(() => {
 
   let globalIndex = 0
 
-  textLines.forEach(line => {
+  textLines.value.forEach(line => {
     line.segments.forEach(segment => {
       if (segment.text === '<skill-rolodex>') {
         result.push({
@@ -133,6 +188,9 @@ const getWordClasses = (wordData: typeof words.value[0]): string[] => {
 let cleanupObserver: (() => void) | null = null
 
 const handleResize = () => {
+  // Check screen size and update mobile state
+  checkScreenSize()
+
   // Trigger CSS recalculations for fluid typography
   if (titleElement.value) {
     titleElement.value.style.setProperty('--container-width', `${titleElement.value.clientWidth}px`)
@@ -142,6 +200,12 @@ const handleResize = () => {
 // Start animation on mount
 onMounted(async () => {
   await nextTick()
+
+  // Initialize screen size detection
+  checkScreenSize()
+
+  // Add resize listener for responsive behavior
+  window.addEventListener('resize', handleResize)
 
   animationStarted.value = true
 
@@ -160,6 +224,8 @@ onUnmounted(() => {
   if (cleanupObserver) {
     cleanupObserver()
   }
+  // Remove resize listener
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
@@ -306,24 +372,24 @@ onUnmounted(() => {
   }
 }
 
-/* Fallback media queries for unsupported browsers */
+/* Mobile-specific larger font size */
 @media (max-width: 768px) {
   .main-title {
-    --base-font-size: clamp(1.5rem, 5vw, 2.5rem);
+    --base-font-size: clamp(2rem, 6vw, 3rem);
     --word-spacing: clamp(0.15em, 0.25vw + 0.1em, 0.25em);
   }
 }
 
 @media (max-width: 480px) {
   .main-title {
-    --base-font-size: clamp(1.25rem, 6vw, 2rem);
+    --base-font-size: clamp(1.75rem, 7vw, 2.5rem);
     --word-spacing: clamp(0.1em, 0.2vw + 0.08em, 0.2em);
   }
 }
 
 @media (max-width: 320px) {
   .main-title {
-    --base-font-size: clamp(1rem, 7vw, 1.5rem);
+    --base-font-size: clamp(1.5rem, 8vw, 2rem);
     --word-spacing: 0.15em;
   }
 }
