@@ -18,13 +18,13 @@ const desktopTextLines = [
     segments: [
       { text: "student using", type: 'description' },
       { text: '<skill-rolodex>', type: 'component' },
-      { text: "to solve", type: 'purpose' }
+      { text: "to answer", type: 'purpose' }
     ]
   },
   {
     lineNumber: 3,
     segments: [
-      { text: "complex business challenges.", type: 'purpose' }
+      { text: "ambiguous questions.", type: 'purpose' }
     ]
   }
 ]
@@ -60,13 +60,13 @@ const mobileTextLines = [
   {
     lineNumber: 5,
     segments: [
-      { text: "to solve complex", type: 'purpose' }
+      { text: "to answer", type: 'purpose' }
     ]
   },
   {
     lineNumber: 6,
     segments: [
-      { text: "business challenges.", type: 'purpose' }
+      { text: "ambiguous questions.", type: 'purpose' }
     ]
   }
 ]
@@ -158,8 +158,8 @@ const getAnimationDelay = (wordData: typeof words.value[0]): string => {
     greeting: 0.1,
     name: 0.15,
     description: 0.12,
-    component: 0.2,
-    purpose: 0.14
+    component: 0.15,
+    purpose: 0.12
   }
 
   const multiplier = timingMultipliers[wordData.segmentType as keyof typeof timingMultipliers] || 0.15
@@ -168,7 +168,7 @@ const getAnimationDelay = (wordData: typeof words.value[0]): string => {
   // Add contextual pauses
   let contextualDelay = 0
   if (wordData.segmentType === 'name') contextualDelay += 0.3
-  if (wordData.segmentType === 'component') contextualDelay += 0.5
+  if (wordData.segmentType === 'component') contextualDelay += 0.1
   if (wordData.segmentType === 'purpose' && wordData.wordIndex === 0) contextualDelay += 0.4
 
   return `${baseDelay + contextualDelay}s`
@@ -344,6 +344,7 @@ onUnmounted(() => {
   align-items: center;
   line-height: 1;
 }
+
 
 /* Animation keyframes with GPU acceleration */
 @keyframes fadeInWord {

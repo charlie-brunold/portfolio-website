@@ -7,10 +7,13 @@ const skills = ['Python', 'SQL', 'C++', 'R', 'Tableau', 'ML', 'data analytics', 
 const currentIndex = ref(0)
 const rolodexElement = ref<HTMLElement>()
 const skillDisplay = ref<HTMLElement>()
+const measureElement = ref<HTMLElement>()
 
 // Animation state
 let animationInterval: number | null = null
+let animationStartTimeout: number | null = null
 const skillWidths = ref<number[]>([])
+const animationStartDelay = 2000 // 2 second delay before animation starts
 
 // Use responsive animation composable
 const {
@@ -31,25 +34,38 @@ const currentSkill = computed(() => skills[currentIndex.value])
 // Current width as CSS custom property
 const currentWidth = computed(() => {
   const width = skillWidths.value[currentIndex.value]
-  return width ? `${width}px` : 'auto'
+  return width ? `${width}px` : initialWidth.value
 })
+
+// Set exact initial width for "Python" to prevent overflow on first visit
+// This is calculated based on font-weight: 600, padding: 0.32em, and typical font sizes
+// Increased to 130px to be safe against font loading delays and rendering variations
+const initialWidth = ref('130px')
 
 // Calculate skill widths using robust measuring system
 const calculateSkillWidths = async () => {
   await nextTick()
+
+  // Wait for fonts to be ready to ensure accurate measurement
+  if ('fonts' in document) {
+    await document.fonts.ready
+  }
 
   if (!rolodexElement.value) return
 
   try {
     const computedStyle = window.getComputedStyle(rolodexElement.value)
     const fontSize = parseFloat(computedStyle.fontSize)
-    const paddingEm = 0.5 // Total horizontal padding (0.25em * 2)
+    const paddingEm = 0.6 // Total horizontal padding (0.3em * 2) - increased for better spacing
     const paddingPx = paddingEm * fontSize
 
     // Use robust measuring system with fallbacks
     skillWidths.value = skills.map(skill => {
-      const measurement = measureText(skill, rolodexElement.value!)
-      return Math.ceil(measurement.width + paddingPx)
+      // Use the hidden measure element if available for more accurate context
+      const targetElement = measureElement.value || rolodexElement.value!
+      const measurement = measureText(skill, targetElement)
+      // Add extra margin for safer spacing
+      return Math.ceil(measurement.width + paddingPx + 8)
     })
 
     // Update CSS custom property for immediate effect
@@ -58,9 +74,9 @@ const calculateSkillWidths = async () => {
     }
   } catch (error) {
     console.warn('Skill width calculation failed, using fallback:', error)
-    // Fallback to character-based calculation
-    const avgCharWidth = 12 // Reasonable fallback
-    skillWidths.value = skills.map(skill => (skill.length * avgCharWidth) + 20)
+    // Fallback to character-based calculation with better spacing
+    const avgCharWidth = 14 // Increased for better spacing
+    skillWidths.value = skills.map(skill => (skill.length * avgCharWidth) + 32)
   }
 }
 
@@ -80,11 +96,23 @@ const animateNextSkill = () => {
 const startAnimation = () => {
   if (!shouldAnimate.value) return
 
+  // Clear any existing timeout and interval
+  if (animationStartTimeout) clearTimeout(animationStartTimeout)
   if (animationInterval) clearInterval(animationInterval)
-  animationInterval = setInterval(animateNextSkill, 2000)
+
+  // Start animation after delay
+  animationStartTimeout = setTimeout(() => {
+    if (shouldAnimate.value) {
+      animationInterval = setInterval(animateNextSkill, 2000)
+    }
+  }, animationStartDelay)
 }
 
 const stopAnimation = () => {
+  if (animationStartTimeout) {
+    clearTimeout(animationStartTimeout)
+    animationStartTimeout = null
+  }
   if (animationInterval) {
     clearInterval(animationInterval)
     animationInterval = null
@@ -138,6 +166,9 @@ onUnmounted(() => {
     class="skill-rolodex"
     :style="{ '--skill-width': currentWidth }"
   >
+    <!-- Hidden element for accurate measuring -->
+    <span ref="measureElement" class="measure-element" aria-hidden="true"></span>
+
     <!-- Skill display with Vue transition -->
     <Transition name="skill-transition" appear>
       <span
@@ -154,7 +185,7 @@ onUnmounted(() => {
 <style scoped>
 .skill-rolodex {
   --skill-width: auto;
-  --padding-horizontal: 0.25em;
+  --padding-horizontal: 0.32em;
 
   position: relative;
   display: inline-block;
@@ -184,6 +215,18 @@ onUnmounted(() => {
   will-change: transform;
 }
 
+/* Hidden element for measuring */
+.measure-element {
+  position: absolute;
+  visibility: hidden;
+  height: auto;
+  width: auto;
+  white-space: nowrap;
+  font-weight: 600; /* Match skill-display */
+  padding: 0;
+  pointer-events: none;
+}
+
 /* Vue Transitions with enhanced performance */
 .skill-transition-enter-active {
   transition: transform 0.5s var(--animation-bezier, cubic-bezier(0.4, 0, 0.2, 1));
@@ -205,26 +248,26 @@ onUnmounted(() => {
 /* Container queries for true responsive behavior */
 @container (max-width: 768px) {
   .skill-rolodex {
-    --padding-horizontal: 0.2em;
+    --padding-horizontal: 0.25em;
   }
 }
 
 @container (max-width: 480px) {
   .skill-rolodex {
-    --padding-horizontal: 0.15em;
+    --padding-horizontal: 0.2em;
   }
 }
 
 /* Fallback media queries for unsupported browsers */
 @media (max-width: 768px) {
   .skill-rolodex {
-    --padding-horizontal: 0.2em;
+    --padding-horizontal: 0.25em;
   }
 }
 
 @media (max-width: 480px) {
   .skill-rolodex {
-    --padding-horizontal: 0.15em;
+    --padding-horizontal: 0.2em;
   }
 }
 

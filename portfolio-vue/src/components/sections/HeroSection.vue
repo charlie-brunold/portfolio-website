@@ -1,10 +1,20 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import AnimatedTitle from '../animations/AnimatedTitle.vue'
+
+// Define emits
+const emit = defineEmits<{
+  titleAnimationComplete: []
+}>()
+
+const handleTitleComplete = () => {
+  emit('titleAnimationComplete')
+}
 </script>
 
 <template>
   <div class="center-content">
-    <AnimatedTitle />
+    <AnimatedTitle @animation-complete="handleTitleComplete" />
   </div>
 </template>
 

@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import HeroSection from '../components/sections/HeroSection.vue'
+
+// Define emits
+const emit = defineEmits<{
+  titleAnimationComplete: []
+}>()
+
+const handleTitleComplete = () => {
+  emit('titleAnimationComplete')
+}
 </script>
 
 <template>
   <main class="main-content">
-    <HeroSection />
+    <HeroSection @title-animation-complete="handleTitleComplete" />
   </main>
 </template>
 
