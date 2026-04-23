@@ -280,7 +280,7 @@ onUnmounted(() => {
   font-weight: 500;
   line-height: var(--line-height);
   margin: 0;
-  color: var(--text-secondary, #666666);
+  color: var(--text-color, #1a1a1a);
   width: 100%;
   max-width: 100%;
   user-select: none;

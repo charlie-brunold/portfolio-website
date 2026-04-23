@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<Props>(), {
   startAnimation: false
 })
 
-const footerText = "Updated September 2025"
+const footerText = "Last updated in November of 2025"
 const animationStarted = ref(false)
 const footerElement = ref<HTMLElement>()
 

@@ -1,325 +1,298 @@
 <template>
-  <div class="ascii-portrait-container">
-    <pre class="ascii-portrait" ref="asciiElement">{{ displayedContent }}</pre>
+  <div class="ascii-portrait-container" ref="container">
+    <canvas ref="canvas" class="ascii-canvas"></canvas>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 
+// Types
+interface Particle {
+  x: number
+  y: number
+  originX: number
+  originY: number
+  char: string
+  color: string
+  density: number // 0 to 1, where 1 is darkest
+  vx: number
+  vy: number
+  size: number
+}
+
+// Refs
+const container = ref<HTMLElement | null>(null)
+const canvas = ref<HTMLCanvasElement | null>(null)
 const asciiContent = ref('')
-const displayedContent = ref('')
-const asciiElement = ref<HTMLElement>()
-const isAnimating = ref(false)
 
-// Cubic bezier easing function - ease-out (starts fast, slows down)
-const easeOutCubic = (t: number): number => {
-  return 1 - Math.pow(1 - t, 3)
-}
+// State
+let ctx: CanvasRenderingContext2D | null = null
+let particles: Particle[] = []
+let animationId: number = 0
+let mouseX = -1000
+let mouseY = -1000
+let mouseVx = 0
+let mouseVy = 0
+let lastMouseX = -1000
+let lastMouseY = -1000
+let lastTime = 0
+let scrollY = 0
+let canvasWidth = 0
+let canvasHeight = 0
+let scaleFactor = 1
 
-// Character stepping sequence from lightest to final character
-const getSteppingCharacter = (finalChar: string, progress: number): string => {
-  if (progress >= 1) return finalChar
+// Optimization
+const GRID_CELL_SIZE = 50
+let grid: Particle[][] = []
+let gridCols = 0
+let activeParticles = new Set<Particle>()
 
-  // Define character sequence from lightest to darkest
-  // Arranged by visual density: lightest -> darkest
-  const characterSequence = [' ', '.', '-', ':', ';', '=', '+', '*', '#', 'x', 'X', '&', '$', '@']
+// Atlas (Removed)
+// let atlasCanvas: HTMLCanvasElement | null = null
+// let charCoords: Record<string, { x: number, y: number }> = {}
+// const ATLAS_FONT_SIZE = 40 // High res for atlas
 
-  // Find where the final character appears in the sequence
-  let finalCharIndex = characterSequence.indexOf(finalChar)
-  if (finalCharIndex === -1) {
-    // If final character isn't in sequence, treat it as space (start of sequence)
-    finalCharIndex = 0
+// Configuration
+// Tuned to match original CSS look (0.27vw)
+const FONT_SIZE_RATIO = 0.0027 
+const LINE_HEIGHT_RATIO = 1.0 
+const CHAR_SPACING_RATIO = 0.58 
+const INFLUENCE_RADIUS = 150 // Larger radius for fluid feel
+const MOUSE_FORCE = 0.8
+const DRAG_COEFF = 0.92
+const RETURN_SPEED = 0.05
+const RENDER_FONT_SIZE = 10 
+
+// Character density map (approximate brightness)
+const getDensity = (char: string): number => {
+  const densityMap: Record<string, number> = {
+    ' ': 0, '.': 0.1, ',': 0.1, ':': 0.2, ';': 0.2, '-': 0.2,
+    '+': 0.3, '*': 0.4, '%': 0.5, '#': 0.6, '@': 0.8, 'M': 0.9, 'W': 0.9
   }
-
-  // Start from the lightest character (index 0) and step toward the final character
-  const stepsNeeded = finalCharIndex // Steps needed to reach final character
-  const currentStepFloat = progress * stepsNeeded
-  const currentStep = Math.floor(currentStepFloat)
-
-  // Clamp to final character index (don't go past the target)
-  const stepIndex = Math.min(currentStep, finalCharIndex)
-
-  return characterSequence[stepIndex]
+  return densityMap[char] || 0.5
 }
 
-const startRevealAnimation = () => {
-  if (isAnimating.value || !asciiContent.value) return
 
-  isAnimating.value = true
-  const finalContent = asciiContent.value
 
-  // Create initial content with all characters starting as spaces for fade-in effect
-  const maskedContent = finalContent.replace(/[^\s\n]/g, ' ')
-  displayedContent.value = maskedContent
+// Initialize particles from ASCII text
+const initParticles = () => {
+  if (!canvas.value || !container.value || !asciiContent.value) return
 
-  // Animation settings
-  const animationDuration = 4500 // Increased to 4.5 seconds for more dramatic effect
-  const startTime = performance.now()
+  const rect = container.value.getBoundingClientRect()
+  canvasWidth = rect.width
+  canvasHeight = rect.height
+  
+  // Set canvas resolution for high DPI displays
+  const dpr = window.devicePixelRatio || 1
+  canvas.value.width = canvasWidth * dpr
+  canvas.value.height = canvasHeight * dpr
+  
+  ctx = canvas.value.getContext('2d')
+  if (!ctx) return
+  
+  // Calculate scale factor
+  // We want the visual size to be window.innerWidth * 0.0027
+  // But we want to render at RENDER_FONT_SIZE (10px)
+  const targetFontSize = window.innerWidth * FONT_SIZE_RATIO
+  scaleFactor = targetFontSize / RENDER_FONT_SIZE
+  
+  // Apply scaling
+  // We scale by dpr * scaleFactor so that 1 unit in canvas = 1 scaled pixel
+  ctx.scale(dpr * scaleFactor, dpr * scaleFactor)
 
-  const chars = finalContent.split('')
-  const displayChars = maskedContent.split('')
+  const lines = asciiContent.value.split('\n')
+  const maxLineLength = Math.max(...lines.map(l => l.length))
+  
+  // Use fixed render font size for calculations
+  const fontSize = RENDER_FONT_SIZE
+  const charSpacing = fontSize * CHAR_SPACING_RATIO
+  const lineHeight = fontSize * LINE_HEIGHT_RATIO
 
-  // Create array of non-whitespace, non-newline character indices for random reveal
-  const revealableIndices: number[] = []
-  chars.forEach((char, index) => {
-    if (char !== '\n' && char !== ' ' && char.trim() !== '') {
-      revealableIndices.push(index)
-    }
+  particles = []
+  
+  // Calculate virtual canvas dimensions (unscaled)
+  const virtualWidth = canvasWidth / scaleFactor
+  const virtualHeight = canvasHeight / scaleFactor
+  
+  // Initialize Grid
+  gridCols = Math.ceil(virtualWidth / GRID_CELL_SIZE)
+  const gridRows = Math.ceil(virtualHeight / GRID_CELL_SIZE)
+  grid = new Array(gridCols * gridRows).fill(null).map(() => [])
+
+  // Align to bottom right in virtual space
+  const totalTextHeight = lines.length * lineHeight
+  const totalTextWidth = maxLineLength * charSpacing
+  
+  // Start from bottom right of the virtual canvas
+  const startX = virtualWidth - totalTextWidth
+  const startY = virtualHeight - totalTextHeight
+
+  lines.forEach((line, row) => {
+    const chars = line.split('')
+    chars.forEach((char, col) => {
+      if (char.trim() === '') return
+
+      const x = startX + col * charSpacing
+      const y = startY + row * lineHeight
+
+      const p: Particle = {
+        x,
+        y,
+        originX: x,
+        originY: y,
+        char,
+        color: '#1a1a1a',
+        density: getDensity(char),
+        vx: 0,
+        vy: 0,
+        size: fontSize
+      }
+      
+      particles.push(p)
+      
+      // Add to grid
+      const gridX = Math.floor(x / GRID_CELL_SIZE)
+      const gridY = Math.floor(y / GRID_CELL_SIZE)
+      const gridIndex = gridY * gridCols + gridX
+      if (grid[gridIndex]) {
+        grid[gridIndex].push(p)
+      }
+    })
+  })
+}
+
+// Animation Loop
+const animate = (time: number) => {
+  if (!ctx || !canvas.value) return
+
+  // Calculate delta time for smooth animation
+  // const dt = (time - lastTime) / 16.67 // Normalize to ~60fps
+  lastTime = time
+
+  // Clear the canvas
+  const virtualWidth = canvasWidth / scaleFactor
+  const virtualHeight = canvasHeight / scaleFactor
+  ctx.clearRect(0, 0, virtualWidth, virtualHeight)
+
+  // 1. Identify active grid cells based on mouse position
+  // We only check physics for particles near the mouse
+  const virtualRadius = INFLUENCE_RADIUS / scaleFactor
+  const startGridX = Math.floor((mouseX - virtualRadius) / GRID_CELL_SIZE)
+  const endGridX = Math.floor((mouseX + virtualRadius) / GRID_CELL_SIZE)
+  const startGridY = Math.floor((mouseY - virtualRadius) / GRID_CELL_SIZE)
+  const endGridY = Math.floor((mouseY + virtualRadius) / GRID_CELL_SIZE)
+
+  // All particles stay at their origin positions (no hover effect)
+
+  // Rendering
+  // Revert to fillText for better visual quality (crispness)
+  particles.forEach(p => {
+    ctx!.font = `700 ${p.size}px 'Courier New', 'Consolas', 'Monaco', monospace`
+    ctx!.fillStyle = p.color
+    ctx!.fillText(p.char, p.x, p.y)
   })
 
-  // Shuffle the indices for random reveal order
-  for (let i = revealableIndices.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[revealableIndices[i], revealableIndices[j]] = [revealableIndices[j], revealableIndices[i]]
-  }
+  // Decay mouse velocity
+  mouseVx *= 0.9
+  mouseVy *= 0.9
 
-  // Track individual character start times for staggered fade effect
-  const charStartTimes: number[] = new Array(revealableIndices.length).fill(0)
-  const charAnimationDuration = animationDuration * 0.95 // Each char takes 95% of total time
-  const totalRevealableChars = revealableIndices.length
-
-  const animateReveal = (currentTime: number) => {
-    const elapsed = currentTime - startTime
-    const progress = Math.min(elapsed / animationDuration, 1)
-
-    // Apply cubic bezier easing for stagger timing
-    const easedProgress = easeOutCubic(progress)
-
-    // Calculate how many characters should have started animating
-    const targetStartedCount = Math.floor(easedProgress * totalRevealableChars)
-
-    // Start character animations based on staggered timing
-    for (let i = 0; i < targetStartedCount; i++) {
-      if (charStartTimes[i] === 0) {
-        charStartTimes[i] = currentTime
-      }
-    }
-
-    // Update each character based on its individual progress
-    let allCharactersComplete = true
-    for (let i = 0; i < revealableIndices.length; i++) {
-      const indexToReveal = revealableIndices[i]
-      const finalChar = chars[indexToReveal]
-
-      if (charStartTimes[i] > 0) {
-        // Character has started animating
-        const charElapsed = currentTime - charStartTimes[i]
-        const charProgress = Math.min(charElapsed / charAnimationDuration, 1)
-        const charEasedProgress = easeOutCubic(charProgress)
-
-        if (charProgress < 1) {
-          allCharactersComplete = false
-        }
-
-        displayChars[indexToReveal] = getSteppingCharacter(finalChar, charEasedProgress)
-      } else {
-        // Character hasn't started yet
-        allCharactersComplete = false
-      }
-    }
-
-    displayedContent.value = displayChars.join('')
-
-    // Continue animation until all individual characters are complete
-    if (!allCharactersComplete) {
-      requestAnimationFrame(animateReveal)
-    } else {
-      // Ensure all characters are fully revealed at the end
-      for (let i = 0; i < revealableIndices.length; i++) {
-        const indexToReveal = revealableIndices[i]
-        displayChars[indexToReveal] = chars[indexToReveal]
-      }
-      displayedContent.value = displayChars.join('')
-      isAnimating.value = false
-    }
-  }
-
-  // Start the animation
-  requestAnimationFrame(animateReveal)
+  animationId = requestAnimationFrame(() => animate(performance.now()))
 }
 
+// Event Handlers
+const handleMouseMove = (e: MouseEvent) => {
+  if (!canvas.value) return
+  const rect = canvas.value.getBoundingClientRect()
+  
+  // Convert screen coordinates to virtual coordinates
+  // 1. Get coordinates relative to canvas (CSS pixels)
+  const rawX = e.clientX - rect.left
+  const rawY = e.clientY - rect.top
+  
+  // 2. Scale to virtual space
+  const currentMouseX = rawX / scaleFactor
+  const currentMouseY = rawY / scaleFactor
+  
+  // Calculate velocity
+  if (lastMouseX !== -1000) {
+    mouseVx = currentMouseX - lastMouseX
+    mouseVy = currentMouseY - lastMouseY
+  }
+  
+  lastMouseX = currentMouseX
+  lastMouseY = currentMouseY
+  mouseX = currentMouseX
+  mouseY = currentMouseY
+}
+
+const handleScroll = () => {
+  scrollY = window.scrollY
+}
+
+const handleResize = () => {
+  initParticles()
+}
+
+// Lifecycle
 onMounted(async () => {
   try {
-    // Import the ASCII content as a text file using Vite's static asset handling
-    const asciiModule = await import('/src/assets/ascii.txt?raw')
+    const asciiModule = await import('@/assets/ascii.txt?raw')
     asciiContent.value = asciiModule.default
-
-    // Check if this is the first visit in this session
-    const hasSeenAnimation = sessionStorage.getItem('ascii-animation-seen')
-
-    if (hasSeenAnimation) {
-      // Show final portrait immediately on subsequent visits
-      displayedContent.value = asciiContent.value
-    } else {
-      // First visit - show animation
-      const maskedContent = asciiContent.value.replace(/[^\s\n]/g, ' ')
-      displayedContent.value = maskedContent
-
-      // Start the reveal animation after a short delay
-      setTimeout(() => {
-        startRevealAnimation()
-        // Mark animation as seen for this session
-        sessionStorage.setItem('ascii-animation-seen', 'true')
-      }, 500)
-    }
+    
+    initParticles()
+    animate(performance.now())
+    
+    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('resize', handleResize)
+    
+    handleScroll()
+    
   } catch (error) {
     console.error('Failed to load ASCII content:', error)
-    // Fallback: try fetching from public directory
-    try {
-      const response = await fetch('/ascii.txt')
-      const content = await response.text()
-      asciiContent.value = content
-
-      // Check if this is the first visit in this session
-      const hasSeenAnimation = sessionStorage.getItem('ascii-animation-seen')
-
-      if (hasSeenAnimation) {
-        // Show final portrait immediately on subsequent visits
-        displayedContent.value = asciiContent.value
-      } else {
-        // First visit - show animation
-        const maskedContent = asciiContent.value.replace(/[^\s\n]/g, ' ')
-        displayedContent.value = maskedContent
-
-        // Start the reveal animation after a short delay
-        setTimeout(() => {
-          startRevealAnimation()
-          // Mark animation as seen for this session
-          sessionStorage.setItem('ascii-animation-seen', 'true')
-        }, 500)
-      }
-    } catch (fallbackError) {
-      console.error('Fallback fetch also failed:', fallbackError)
-      displayedContent.value = 'Failed to load ASCII portrait'
-    }
   }
+})
+
+onBeforeUnmount(() => {
+  cancelAnimationFrame(animationId)
+  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
 <style scoped>
+/* Restore original fixed positioning */
 .ascii-portrait-container {
+  position: fixed;
+  bottom: -10vh;
+  right: -8vw;
+  width: 120vw;
+  height: 140vh;
+  z-index: 1;
+  pointer-events: none; /* Let clicks pass through, but we track mouse via window */
+  
+  /* Flex alignment from original */
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.ascii-canvas {
+  display: block;
   width: 100%;
   height: 100%;
-  overflow: visible;
-  padding: 0;
-  padding-left: 43%;
-  padding-top: 5%;
-  box-sizing: border-box;
 }
 
-.ascii-portrait {
-  font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
-  line-height: 1;
-  white-space: pre;
-  margin: 0;
-  padding: 0;
-  color: #1a1a1a;
-  text-align: right;
-  overflow: visible;
-
-  /* Base size for desktop - using viewport units to maintain fixed screen size */
-  font-size: 0.27vw;
-
-  /* Enhanced visibility with stroke weight */
-  font-weight: 700;
-
-  /* Responsive scaling */
-  transform-origin: bottom right;
-  max-width: none;
-  max-height: none;
-
-  /* Performance optimizations */
-  will-change: transform;
-  backface-visibility: hidden;
-
-  /* Scale to fit container while maintaining aspect ratio */
-  transform: scale(1);
-
-  /* Ensure perfect character alignment */
-  letter-spacing: -0.02em;
-  word-spacing: 0;
-  text-rendering: optimizeSpeed;
-
-  /* Prevent any text artifacts during animation */
-  -webkit-font-smoothing: auto;
-  -moz-osx-font-smoothing: auto;
-}
-
-/* Tablet and smaller desktop screens */
-@media (max-width: 1200px) {
-  .ascii-portrait {
-    font-size: 0.22vw;
-    max-height: none;
-  }
-}
-
-/* Small tablets */
+/* Mobile layout adjustments */
 @media (max-width: 768px) {
-  .ascii-portrait {
-    font-size: 0.35vw;
-    max-height: none;
-    text-align: center;
-  }
-
   .ascii-portrait-container {
-    padding: 15px;
+    bottom: -15vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 120vh;
+    justify-content: center;
+    right: auto;
   }
-}
-
-/* Mobile phones */
-@media (max-width: 480px) {
-  .ascii-portrait {
-    font-size: 0.4vw;
-    max-height: none;
-    text-align: center;
-  }
-
-  .ascii-portrait-container {
-    padding: 10px;
-    min-height: 70vh;
-  }
-}
-
-/* Very small mobile screens */
-@media (max-width: 360px) {
-  .ascii-portrait {
-    font-size: 0.45vw;
-    max-height: none;
-    text-align: center;
-  }
-
-  .ascii-portrait-container {
-    padding: 8px;
-    min-height: 65vh;
-  }
-}
-
-/* Large desktop screens */
-@media (min-width: 1400px) {
-  .ascii-portrait {
-    font-size: 0.23vw;
-    max-height: none;
-  }
-}
-
-/* Extra large screens */
-@media (min-width: 1800px) {
-  .ascii-portrait {
-    font-size: 0.27vw;
-    max-height: none;
-  }
-}
-
-
-/* Ensure no text selection issues */
-.ascii-portrait {
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
 }
 </style>

@@ -3,6 +3,8 @@ import { computed, ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import AppNavigation from './components/navigation/AppNavigation.vue'
 import AnimatedFooter from './components/animations/AnimatedFooter.vue'
+import ShaderBackground from './components/animations/ShaderBackground.vue'
+import { useWheelProgress } from './composables/useScrollAnimation'
 
 const route = useRoute()
 const isHomePage = computed(() => route.name === 'home')
@@ -11,6 +13,9 @@ const previousRoute = ref<string | null>(null)
 const transitionName = ref('depth-shift')
 const footerAnimationStarted = ref(false)
 const isInitialLoad = ref(true)
+
+// Virtual scroll progress — works even with body overflow: hidden
+const { progress: scrollProgress } = useWheelProgress(4500)
 
 const handleTitleAnimationComplete = () => {
   footerAnimationStarted.value = true
@@ -26,6 +31,18 @@ onMounted(() => {
     }, 2500)
   }
   isInitialLoad.value = false
+
+  // Wait for layout to finalize, then log scroll config
+  setTimeout(() => {
+    const endOffset = document.body.scrollHeight - window.innerHeight
+    console.log('App.vue: scroll config after layout', {
+      startOffset: 0,
+      endOffset,
+      bodyScrollHeight: document.body.scrollHeight,
+      windowHeight: window.innerHeight,
+      isScrollable: endOffset > 0
+    })
+  }, 100)
 })
 
 // Watch route changes to determine transition type
@@ -47,6 +64,10 @@ watch(route, (to, from) => {
 
 <template>
   <div id="app">
+    <Transition name="shader-fade">
+      <ShaderBackground v-if="isHomePage" />
+    </Transition>
+
     <AppNavigation />
 
     <div class="router-container">
@@ -117,6 +138,20 @@ watch(route, (to, from) => {
 .footer-fade-leave-to {
   opacity: 0;
   transform: translateY(-15px);
+}
+
+/* Shader background fade */
+.shader-fade-enter-active {
+  transition: opacity 1.5s ease;
+}
+
+.shader-fade-leave-active {
+  transition: opacity 0.6s ease;
+}
+
+.shader-fade-enter-from,
+.shader-fade-leave-to {
+  opacity: 0;
 }
 
 /* Depth shift transition animations */

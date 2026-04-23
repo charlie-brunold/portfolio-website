@@ -1,5 +1,49 @@
 import { ref, onMounted, onUnmounted, type Ref } from 'vue'
 
+/**
+ * Tracks scroll-like progress via wheel and touch events even when
+ * body overflow is hidden (no real document scroll possible).
+ * progress is a reactive ref [0, 1].
+ */
+export function useWheelProgress(totalDistance = 1200) {
+  const progress = ref(0)
+  let virtualY = 0
+  let lastTouchY = 0
+
+  const update = (delta: number) => {
+    virtualY = Math.max(0, Math.min(totalDistance, virtualY + delta))
+    progress.value = virtualY / totalDistance
+  }
+
+  const onWheel = (e: WheelEvent) => {
+    update(e.deltaY)
+  }
+
+  const onTouchStart = (e: TouchEvent) => {
+    lastTouchY = e.touches[0].clientY
+  }
+
+  const onTouchMove = (e: TouchEvent) => {
+    const delta = lastTouchY - e.touches[0].clientY
+    lastTouchY = e.touches[0].clientY
+    update(delta)
+  }
+
+  onMounted(() => {
+    window.addEventListener('wheel', onWheel, { passive: true })
+    window.addEventListener('touchstart', onTouchStart, { passive: true })
+    window.addEventListener('touchmove', onTouchMove, { passive: true })
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('wheel', onWheel)
+    window.removeEventListener('touchstart', onTouchStart)
+    window.removeEventListener('touchmove', onTouchMove)
+  })
+
+  return { progress: progress as Ref<number> }
+}
+
 export interface ScrollAnimationOptions {
   startOffset?: number
   endOffset?: number

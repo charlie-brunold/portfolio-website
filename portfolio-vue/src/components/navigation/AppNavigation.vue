@@ -49,7 +49,7 @@ onUnmounted(() => {
   right: 0;
   background: var(--nav-background);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(26, 26, 26, 0.1);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.25);
   z-index: 100;
   display: flex;
   justify-content: space-between;

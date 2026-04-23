@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import HeroSection from '../components/sections/HeroSection.vue'
 
-// Define emits
 const emit = defineEmits<{
   titleAnimationComplete: []
 }>()
@@ -13,7 +12,8 @@ const handleTitleComplete = () => {
 
 <template>
   <main class="main-content">
-    <HeroSection @title-animation-complete="handleTitleComplete" />
+    <!-- Hero content hidden temporarily to preview background animation -->
+    <!-- <HeroSection @title-animation-complete="handleTitleComplete" /> -->
   </main>
 </template>
 
