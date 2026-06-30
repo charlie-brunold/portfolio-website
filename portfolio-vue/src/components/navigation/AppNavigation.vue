@@ -32,7 +32,10 @@ onUnmounted(() => {
 
 <template>
   <nav ref="nav" class="navigation">
-    <router-link to="/" class="nav-brand">Charlie Brunold</router-link>
+    <router-link to="/" class="nav-brand">
+      <span class="brand-full">Charlie Brunold</span>
+      <span class="brand-short">CB</span>
+    </router-link>
     <div class="nav-links">
       <router-link to="/work" class="nav-link">Work</router-link>
       <router-link to="/about" class="nav-link">About</router-link>
@@ -101,21 +104,30 @@ onUnmounted(() => {
   }
 }
 
+.brand-short {
+  display: none;
+}
+
 @media (max-width: 480px) {
-  .nav-brand {
-    font-size: 16px;
-  }
-  
-  .nav-links {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
   .navigation {
-    flex-direction: column;
-    align-items: flex-start;
+    padding: 8px var(--spacing-sm);
     height: auto;
-    padding: var(--spacing-sm);
+  }
+
+  .nav-brand {
+    font-size: 15px;
+  }
+
+  .brand-full {
+    display: none;
+  }
+
+  .brand-short {
+    display: inline;
+  }
+
+  .nav-links {
+    gap: 12px;
   }
 }
 </style>
